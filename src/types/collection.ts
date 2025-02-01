@@ -2,7 +2,7 @@ import { Artwork, CustomUser } from './artwork';
 
 export interface Collection {
   id: string;
-  name: string;
+  name: string; // Eğer name özelliği yoksa, buraya ekleyin
   description?: string;
   user_id: string;
   created_at: string;
