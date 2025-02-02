@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,16 +9,21 @@ import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2 } from 'lucide-react';
 
-// Lazy loaded components
-const Hero = lazy(() => import('@/components/sections/Hero'));
-const Features = lazy(() => import('@/components/sections/Features'));
-const Gallery = lazy(() => import('@/components/sections/Gallery'));
-const Testimonials = lazy(() => import('@/components/sections/Testimonials'));
+// Lazy loaded components with preload
+const Hero = import('@/components/sections/Hero');
+const Features = import('@/components/sections/Features');
+const Gallery = import('@/components/sections/Gallery');
 
-// Loading component
+// Preload components
+Promise.all([Hero, Features, Gallery]);
+
+// Loading component with skeleton
 const SectionLoader = () => (
-  <div className="w-full h-[50vh] flex items-center justify-center">
-    <Loader2 className="w-8 h-8 animate-spin" />
+  <div className="w-full h-[50vh] flex items-center justify-center bg-black">
+    <div className="flex flex-col items-center gap-4">
+      <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
+      <p className="text-sm text-gray-400">Yükleniyor...</p>
+    </div>
   </div>
 );
 
@@ -120,23 +125,28 @@ export default function Home() {
     <motion.main
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="flex-1"
+      transition={{ duration: 0.3 }}
+      className="flex-1 bg-black"
     >
       <Suspense fallback={<SectionLoader />}>
-        <Hero />
+        {Hero.then(module => {
+          const HeroComponent = module.default;
+          return <HeroComponent />;
+        })}
       </Suspense>
 
       <Suspense fallback={<SectionLoader />}>
-        <Features />
+        {Features.then(module => {
+          const FeaturesComponent = module.default;
+          return <FeaturesComponent />;
+        })}
       </Suspense>
 
       <Suspense fallback={<SectionLoader />}>
-        <Gallery />
-      </Suspense>
-
-      <Suspense fallback={<SectionLoader />}>
-        <Testimonials />
+        {Gallery.then(module => {
+          const GalleryComponent = module.default;
+          return <GalleryComponent />;
+        })}
       </Suspense>
     </motion.main>
   );
