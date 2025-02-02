@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ChatInterface } from '@/features/Chat/components/ChatInterface';
-import { OpenSourceAI } from '@/services/ai/OpenSourceAI';
+import { ChatInterface } from '../../features/Chat/components/ChatInterface';
+import { OpenSourceAI } from '../../services/ai/OpenSourceAI';
 
 export default function Chat() {
   useEffect(() => {

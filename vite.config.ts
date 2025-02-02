@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': path.resolve(__dirname, './src'),
       },
+      dedupe: ['react', 'react-dom']
     },
     server: {
       port: 3000,
@@ -28,24 +29,38 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       sourcemap: true,
       rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html')
+        },
         output: {
-          manualChunks: {
-            'next-themes': ['next-themes'],
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              if (id.includes('next-themes')) {
+                return 'next-themes';
+              }
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'react-vendor';
+              }
+              if (id.includes('@radix-ui') || id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) {
+                return 'ui-vendor';
+              }
+              return 'vendor';
+            }
           }
         },
         onwarn(warning, warn) {
           if (warning.code === 'EVAL' || 
               warning.code === 'SOURCEMAP_ERROR' || 
-              warning.code === 'THIS_IS_UNDEFINED') return;
+              warning.code === 'THIS_IS_UNDEFINED' ||
+              warning.code === 'MISSING_EXPORT') return;
           warn(warning);
         }
       },
       commonjsOptions: {
-        transformMixedEsModules: true,
         include: [/node_modules/],
-        exclude: [/node_modules\/next-themes/]
+        extensions: ['.js', '.cjs', '.jsx', '.tsx', '.ts'],
+        strictRequires: true,
+        transformMixedEsModules: true
       },
       target: 'es2015',
       minify: 'terser',
@@ -56,7 +71,6 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    envDir: '.', // .env dosyalarının okunacağı dizin
     optimizeDeps: {
       include: [
         'react', 
@@ -67,13 +81,19 @@ export default defineConfig(({ mode }) => {
         '@radix-ui/react-slot',
         'class-variance-authority',
         'clsx',
-        'tailwind-merge'
+        'tailwind-merge',
+        'framer-motion',
+        'lucide-react'
       ],
-      exclude: []
+      exclude: [],
+      esbuildOptions: {
+        target: 'es2020'
+      }
     },
     define: {
       'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
       'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
     },
+    envDir: '.', // .env dosyalarının okunacağı dizin
   };
 });
