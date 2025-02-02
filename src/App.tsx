@@ -12,7 +12,7 @@ import Home from '@/pages/Home';
 import Gallery from '@/pages/gallery';
 import AiArt from '@/pages/AiArt';
 import AiAudio from '@/pages/AiAudio';
-import { default as AiChat } from '@/pages/AiChat';
+import Chat from '@/pages/ai/chat';
 import AiVideo from '@/pages/AiVideo';
 import Competitions from '@/pages/Competitions';
 import Login from '@/pages/auth/login';
@@ -77,7 +77,7 @@ function App() {
         <Route path="/gallery/*" element={<Gallery />} />
         <Route path="/ai/art" element={<AiArt />} />
         <Route path="/ai/audio" element={<AiAudio />} />
-        <Route path="/ai/chat" element={<AiChat />} />
+        <Route path="/ai/chat" element={<Chat />} />
         <Route path="/ai/video" element={<AiVideo />} />
         <Route path="/competitions" element={<Competitions />} />
         <Route path="/auth/login" element={<Login />} />
