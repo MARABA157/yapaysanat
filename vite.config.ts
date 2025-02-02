@@ -58,7 +58,8 @@ export default defineConfig(({ mode }) => {
           },
           manualChunks: {
             'react-vendor': ['react', 'react-dom'],
-            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
+            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge'],
+            'styled': ['styled-components']
           },
           format: 'es',
           generatedCode: {
