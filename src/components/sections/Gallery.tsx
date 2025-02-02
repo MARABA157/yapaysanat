@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { theme } from '../../styles/theme';
-import Masonry from 'react-masonry-css';
 
 const GalleryContainer = styled.section`
   padding: ${theme.spacing.xxl} 0;
@@ -25,17 +24,12 @@ const GalleryDescription = styled(motion.p)`
   margin: 0 auto;
 `;
 
-const MasonryGrid = styled(Masonry)`
-  display: flex;
-  width: 100%;
+const GalleryGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: ${theme.spacing.md};
-  padding: 0 ${theme.spacing.xl};
-
-  & > div {
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing.md};
-  }
+  padding: ${theme.spacing.xl};
+  direction: rtl; // Sağdan sola akış için
 `;
 
 const ArtworkCard = styled(motion.div)`
@@ -43,6 +37,14 @@ const ArtworkCard = styled(motion.div)`
   border-radius: ${theme.layout.radius.lg};
   overflow: hidden;
   cursor: pointer;
+  aspect-ratio: 1;
+  direction: ltr; // İçeriği normal yönde göster
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   &:hover {
     .artwork-info {
@@ -53,13 +55,8 @@ const ArtworkCard = styled(motion.div)`
 
 const ArtworkImage = styled.img`
   width: 100%;
-  height: auto;
-  display: block;
-  transition: transform ${theme.transitions.medium};
-
-  ${ArtworkCard}:hover & {
-    transform: scale(1.05);
-  }
+  height: 100%;
+  object-fit: cover;
 `;
 
 const ArtworkInfo = styled(motion.div)`
@@ -76,7 +73,6 @@ const ArtworkInfo = styled(motion.div)`
   color: ${theme.colors.primary.white};
   opacity: 0;
   transition: opacity ${theme.transitions.medium};
-  class-name: "artwork-info";
 `;
 
 const ArtworkTitle = styled.h3`
@@ -131,13 +127,6 @@ interface Artwork {
   category: string;
 }
 
-const breakpointColumns = {
-  default: 4,
-  1100: 3,
-  700: 2,
-  500: 1
-};
-
 const artworks = [
   {
     id: 1,
@@ -180,7 +169,6 @@ export default function Gallery() {
   const [visibleArtworks, setVisibleArtworks] = useState<Artwork[]>([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [page, setPage] = useState(1);
-  const itemsPerPage = 12;
 
   const filters = [
     { id: 'all', label: 'Tümü' },
@@ -194,7 +182,7 @@ export default function Gallery() {
     const filtered = artworks.filter(
       artwork => activeFilter === 'all' || artwork.category === activeFilter
     );
-    setVisibleArtworks(filtered.slice(0, page * itemsPerPage));
+    setVisibleArtworks(filtered.slice(0, page * 12));
   }, [activeFilter, page]);
 
   const loadMore = () => {
@@ -234,22 +222,17 @@ export default function Gallery() {
         ))}
       </FilterContainer>
 
-      <MasonryGrid
-        breakpointCols={breakpointColumns}
-        className="masonry-grid"
-        columnClassName="masonry-grid_column"
-      >
+      <GalleryGrid>
         <AnimatePresence>
           {visibleArtworks.map((artwork, index) => (
             <ArtworkCard
               key={artwork.id}
-              as={motion.div}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <ArtworkImage src={artwork.image} alt={artwork.title} loading="lazy" />
+              <ArtworkImage src={artwork.image} alt={artwork.title} />
               <ArtworkInfo>
                 <ArtworkTitle>{artwork.title}</ArtworkTitle>
                 <ArtworkArtist>{artwork.artist}</ArtworkArtist>
@@ -257,7 +240,7 @@ export default function Gallery() {
             </ArtworkCard>
           ))}
         </AnimatePresence>
-      </MasonryGrid>
+      </GalleryGrid>
 
       {visibleArtworks.length < artworks.length && (
         <LoadMoreButton
