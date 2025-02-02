@@ -38,19 +38,16 @@ export default defineConfig(({ mode }) => {
           main: path.resolve(__dirname, 'index.html')
         },
         output: {
-          manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              if (id.includes('next-themes')) {
-                return 'next-themes';
-              }
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor';
-              }
-              if (id.includes('@radix-ui') || id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) {
-                return 'ui-vendor';
-              }
-              return 'vendor';
-            }
+          manualChunks: {
+            'next-themes': ['next-themes'],
+            'react-vendor': ['react', 'react-dom'],
+            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
+          },
+          format: 'es',
+          generatedCode: {
+            arrowFunctions: true,
+            constBindings: true,
+            objectShorthand: true
           }
         },
         onwarn(warning, warn) {
@@ -60,21 +57,37 @@ export default defineConfig(({ mode }) => {
               warning.code === 'MISSING_EXPORT' ||
               warning.code === 'PURE_COMMENT_HAS_INVALID_POSITION') return;
           warn(warning);
+        },
+        preserveEntrySignatures: 'strict',
+        treeshake: {
+          moduleSideEffects: true,
+          propertyReadSideEffects: false,
+          tryCatchDeoptimization: false
         }
       },
       commonjsOptions: {
         include: [/node_modules/],
         extensions: ['.js', '.cjs', '.jsx', '.tsx', '.ts'],
         strictRequires: true,
-        transformMixedEsModules: true
+        transformMixedEsModules: true,
+        sourceMap: true
       },
       target: 'es2015',
       minify: 'terser',
       terserOptions: {
         compress: {
+          arrows: true,
           drop_console: true,
           drop_debugger: true,
-          pure_funcs: ['console.log']
+          pure_funcs: ['console.log'],
+          passes: 2
+        },
+        mangle: {
+          safari10: true
+        },
+        format: {
+          comments: false,
+          preserve_annotations: true
         }
       }
     },
@@ -94,7 +107,11 @@ export default defineConfig(({ mode }) => {
       ],
       exclude: [],
       esbuildOptions: {
-        target: 'es2020'
+        target: 'es2020',
+        format: 'esm',
+        treeShaking: true,
+        minify: true,
+        keepNames: true
       }
     },
     define: {
