@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Video, Music, MessageSquare, ArrowRight, Sparkles } from 'lucide-react';
+import { Wand2, Video, Music, MessageSquare, ArrowRight, Sparkles, Bot, Star, Image as ImageIcon, Users, Search, Globe2, Zap, Crown, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const features = [
