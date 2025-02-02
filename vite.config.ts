@@ -9,17 +9,10 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react({
-        jsxRuntime: 'automatic',
         jsxImportSource: '@emotion/react',
         babel: {
-          presets: [
-            ['@babel/preset-react', { runtime: 'automatic' }]
-          ],
           plugins: [
-            ['babel-plugin-styled-components', {
-              displayName: true,
-              fileName: false
-            }]
+            'babel-plugin-styled-components'
           ]
         }
       }),
@@ -73,7 +66,7 @@ export default defineConfig(({ mode }) => {
         }
       },
       commonjsOptions: {
-        include: [/node_modules/],
+        include: [/styled-components/, /node_modules/],
         extensions: ['.js', '.cjs', '.jsx', '.tsx', '.ts'],
         strictRequires: true,
         transformMixedEsModules: true,
@@ -109,7 +102,8 @@ export default defineConfig(({ mode }) => {
         'clsx',
         'tailwind-merge',
         'framer-motion',
-        'lucide-react'
+        'lucide-react',
+        'styled-components'
       ],
       exclude: [],
       esbuildOptions: {

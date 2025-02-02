@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { StyleSheetManager } from 'styled-components';
 import App from './App';
 import './index.css';
 
@@ -19,7 +20,9 @@ ReactDOM.createRoot(root).render(
       <BrowserRouter>
         <AuthProvider>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <App />
+            <StyleSheetManager shouldComponentUpdate={true}>
+              <App />
+            </StyleSheetManager>
           </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
