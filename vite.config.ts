@@ -14,6 +14,12 @@ export default defineConfig(({ mode }) => {
         babel: {
           presets: [
             ['@babel/preset-react', { runtime: 'automatic' }]
+          ],
+          plugins: [
+            ['babel-plugin-styled-components', {
+              displayName: true,
+              fileName: false
+            }]
           ]
         }
       }),
@@ -21,6 +27,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
+        'styled-components': 'styled-components/dist/styled-components.js'
       },
       dedupe: ['react', 'react-dom']
     },
