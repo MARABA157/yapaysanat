@@ -7,31 +7,22 @@ import { ThemeProvider } from '@/providers/ThemeProvider'
 import App from './App'
 import './index.css'
 
-// Import styled-components dinamik olarak
-const loadStyledComponents = async () => {
-  const { StyleSheetManager } = await import('styled-components')
-  
-  const root = document.getElementById('root') as HTMLElement;
+const root = document.getElementById('root') as HTMLElement
 
-  if (!root) {
-    throw new Error('Root element not found');
-  }
-
-  ReactDOM.createRoot(root).render(
-    <React.StrictMode>
-      <HelmetProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-              <StyleSheetManager shouldComponentUpdate={true}>
-                <App />
-              </StyleSheetManager>
-            </ThemeProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </HelmetProvider>
-    </React.StrictMode>,
-  )
+if (!root) {
+  throw new Error('Root element not found')
 }
 
-loadStyledComponents()
+ReactDOM.createRoot(root).render(
+  <React.StrictMode>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <App />
+          </ThemeProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </HelmetProvider>
+  </React.StrictMode>
+)
