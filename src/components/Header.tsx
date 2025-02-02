@@ -22,7 +22,7 @@ export function Header() {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-300 ${
         isScrolled 
           ? 'bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/80 border-violet-500/20' 
           : 'bg-black/70 backdrop-blur-sm'
@@ -33,7 +33,7 @@ export function Header() {
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400">
-                ArtVerse
+                Sanat Galerisi
               </span>
             </Link>
           </div>
@@ -46,19 +46,19 @@ export function Header() {
                 Gelişmiş Arama
               </Button>
             </Link>
-            <Link to="/ai/enhancement">
+            <Link to="/ai/art">
               <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-violet-400 hover:bg-violet-500/10">
                 <Wand2 className="w-4 h-4" />
                 AI Geliştirme
               </Button>
             </Link>
-            <Link to="/ai-video">
+            <Link to="/ai/video">
               <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-violet-400 hover:bg-violet-500/10">
                 <Video className="w-4 h-4" />
                 AI Video
               </Button>
             </Link>
-            <Link to="/ai-chat">
+            <Link to="/ai/chat">
               <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-fuchsia-400 hover:bg-fuchsia-500/10">
                 <Bot className="w-4 h-4" />
                 AI Chat
@@ -99,19 +99,16 @@ export function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </Button>
-          </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
         </div>
 
         {/* Mobile Menu */}
@@ -124,19 +121,19 @@ export function Header() {
                   Gelişmiş Arama
                 </Button>
               </Link>
-              <Link to="/ai/enhancement">
+              <Link to="/ai/art">
                 <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
                   <Wand2 className="w-4 h-4" />
                   AI Geliştirme
                 </Button>
               </Link>
-              <Link to="/ai-video">
+              <Link to="/ai/video">
                 <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
                   <Video className="w-4 h-4" />
                   AI Video
                 </Button>
               </Link>
-              <Link to="/ai-chat">
+              <Link to="/ai/chat">
                 <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
                   <Bot className="w-4 h-4" />
                   AI Chat
@@ -172,8 +169,6 @@ export function Header() {
                   </Link>
                 </>
               )}
-
-              <ThemeToggle className="w-full justify-start" />
             </div>
           </div>
         )}
