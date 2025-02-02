@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
         'styled-components': path.resolve(__dirname, 'node_modules/styled-components')
       },
-      dedupe: ['react', 'react-dom']
+      dedupe: ['react', 'react-dom', 'styled-components']
     },
     server: {
       port: 3000,
@@ -53,6 +53,9 @@ export default defineConfig(({ mode }) => {
           main: path.resolve(__dirname, 'index.html')
         },
         output: {
+          paths: {
+            'styled-components': './node_modules/styled-components/dist/styled-components.browser.esm.js'
+          },
           manualChunks: {
             'react-vendor': ['react', 'react-dom'],
             'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
