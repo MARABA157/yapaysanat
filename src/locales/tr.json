@@ -1,0 +1,69 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "success": "İşlem başarılı"
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifreyi Onayla",
+    "forgotPassword": "Şifremi Unuttum",
+    "2fa": "İki Faktörlü Doğrulama",
+    "2faCode": "Doğrulama Kodu",
+    "enable2fa": "İki Faktörlü Doğrulamayı Etkinleştir",
+    "disable2fa": "İki Faktörlü Doğrulamayı Devre Dışı Bırak"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "aiChat": "AI Chat",
+    "aiDev": "AI Geliştirme",
+    "aiVideo": "AI Video",
+    "aiMusic": "AI Müzik",
+    "premium": "Premium",
+    "profile": "Profil",
+    "settings": "Ayarlar"
+  },
+  "features": {
+    "title": "AI Araçlarımız",
+    "subtitle": "Sanatınızı yapay zeka ile bir üst seviyeye taşıyın",
+    "chat": {
+      "title": "AI Sohbet",
+      "description": "Sanat hakkında her şeyi sorabileceğiniz yapay zeka asistanı"
+    },
+    "dev": {
+      "title": "AI Geliştirme",
+      "description": "Kendi sanat stilinizi yapay zeka ile geliştirin"
+    },
+    "video": {
+      "title": "AI Video",
+      "description": "Videolarınızı sanatsal yapay zeka efektleriyle zenginleştirin"
+    },
+    "music": {
+      "title": "AI Müzik",
+      "description": "Müziğinizi yapay zeka ile besleyin"
+    }
+  },
+  "gallery": {
+    "title": "Keşfet",
+    "subtitle": "Sanatçılarımızın en beğenilen eserleri"
+  },
+  "profile": {
+    "title": "Profil",
+    "portfolio": "Portfolyo",
+    "works": "Eserler",
+    "followers": "Takipçiler",
+    "following": "Takip Edilenler",
+    "edit": "Profili Düzenle"
+  },
+  "workshop": {
+    "title": "Workshop",
+    "upload": "Eser Yükle",
+    "analyze": "AI ile Analiz Et",
+    "improve": "Geliştir",
+    "share": "Paylaş"
+  }
+}
