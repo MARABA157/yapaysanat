@@ -14,7 +14,6 @@ const Hero = lazy(() => import('@/components/sections/Hero'));
 const Features = lazy(() => import('@/components/sections/Features'));
 const Gallery = lazy(() => import('@/components/sections/Gallery'));
 const Testimonials = lazy(() => import('@/components/sections/Testimonials'));
-const CallToAction = lazy(() => import('@/components/sections/CallToAction'));
 
 // Loading component
 const SectionLoader = () => (
@@ -138,10 +137,6 @@ export default function Home() {
 
       <Suspense fallback={<SectionLoader />}>
         <Testimonials />
-      </Suspense>
-
-      <Suspense fallback={<SectionLoader />}>
-        <CallToAction />
       </Suspense>
     </motion.main>
   );
