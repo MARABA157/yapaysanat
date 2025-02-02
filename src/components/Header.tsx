@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Bot, Sparkles, Video, Menu, X, LogIn, UserPlus, Search, Wand2, Crown } from 'lucide-react';
+import { Bot, Sparkles, Video, Menu, X, LogIn, UserPlus, Search, Wand2, Crown, Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -62,6 +62,12 @@ export function Header() {
               <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-fuchsia-400 hover:bg-fuchsia-500/10">
                 <Bot className="w-4 h-4" />
                 AI Chat
+              </Button>
+            </Link>
+            <Link to="/ai/music">
+              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-fuchsia-400 hover:bg-fuchsia-500/10">
+                <Music className="w-4 h-4" />
+                AI Müzik
               </Button>
             </Link>
             <Link to="/premium">
@@ -137,6 +143,12 @@ export function Header() {
                 <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
                   <Bot className="w-4 h-4" />
                   AI Chat
+                </Button>
+              </Link>
+              <Link to="/ai/music">
+                <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
+                  <Music className="w-4 h-4" />
+                  AI Müzik
                 </Button>
               </Link>
               <Link to="/premium">

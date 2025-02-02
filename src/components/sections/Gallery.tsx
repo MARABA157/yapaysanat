@@ -47,6 +47,15 @@ export default function Gallery() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
+  // Otomatik kaydırma
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % artworks.length);
+    }, 5000); // Her 5 saniyede bir değiştir
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Önceden yükle
   useEffect(() => {
     const nextIndex = (currentIndex + 1) % artworks.length;
@@ -85,7 +94,7 @@ export default function Gallery() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400">
-            Galeri
+            Keşfet
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Sanatçılarımızın en beğenilen eserleri
