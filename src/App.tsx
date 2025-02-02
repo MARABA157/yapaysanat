@@ -9,10 +9,10 @@ import { AutoTrainer } from '@/services/ai/AutoTrainer';
 
 // Pages
 import Home from '@/pages/Home';
-import Gallery from '@/pages/Gallery';
+import Gallery from '@/pages/gallery';
 import AiArt from '@/pages/AiArt';
 import AiAudio from '@/pages/AiAudio';
-import AiChat from '@/pages/AiChat';
+import { default as AiChat } from '@/pages/AiChat';
 import AiVideo from '@/pages/AiVideo';
 import Competitions from '@/pages/Competitions';
 import Login from '@/pages/auth/login';

@@ -30,10 +30,13 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: ['react', 'react-dom'],
-          },
-        },
+            'next-themes': ['next-themes']
+          }
+        }
       },
+      commonjsOptions: {
+        transformMixedEsModules: true
+      }
     },
     envDir: '.', // .env dosyalarının okunacağı dizin
     optimizeDeps: {
