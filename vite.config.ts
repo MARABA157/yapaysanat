@@ -32,15 +32,22 @@ export default defineConfig(({ mode }) => {
           manualChunks: {
             'next-themes': ['next-themes']
           }
+        },
+        onwarn(warning, warn) {
+          if (warning.code === 'EVAL' || warning.code === 'SOURCEMAP_ERROR') return;
+          warn(warning);
         }
       },
       commonjsOptions: {
-        transformMixedEsModules: true
+        transformMixedEsModules: true,
+        include: [/node_modules/],
+        exclude: [/node_modules\/next-themes/]
       }
     },
     envDir: '.', // .env dosyalarının okunacağı dizin
     optimizeDeps: {
-      include: ['react', 'react-dom'],
+      include: ['react', 'react-dom', 'next-themes'],
+      exclude: []
     },
     define: {
       'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
