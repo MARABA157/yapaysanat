@@ -9,7 +9,7 @@ import { AutoTrainer } from '@/services/ai/AutoTrainer';
 
 // Pages
 import Home from '@/pages/Home';
-import Gallery from '@/pages/gallery';
+import Gallery from '@/pages/Gallery';
 import AiArt from '@/pages/AiArt';
 import AiAudio from '@/pages/AiAudio';
 import AiChat from '@/pages/AiChat';
