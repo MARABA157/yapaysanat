@@ -15,7 +15,15 @@
     "2fa": "İki Faktörlü Doğrulama",
     "2faCode": "Doğrulama Kodu",
     "enable2fa": "İki Faktörlü Doğrulamayı Etkinleştir",
-    "disable2fa": "İki Faktörlü Doğrulamayı Devre Dışı Bırak"
+    "disable2fa": "İki Faktörlü Doğrulamayı Devre Dışı Bırak",
+    "2faEnabled": "İki faktörlü doğrulama etkin",
+    "setup2fa": "İki Faktörlü Doğrulama Kurulumu",
+    "scan2faQR": "Google Authenticator veya benzer bir uygulama ile QR kodu tarayın",
+    "verify": "Doğrula",
+    "backupCode": "Yedek Kodunuz",
+    "saveBackupCode": "Bu kodu güvenli bir yerde saklayın",
+    "invalidCode": "Geçersiz kod",
+    "verificationError": "Doğrulama hatası"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -26,6 +34,29 @@
     "premium": "Premium",
     "profile": "Profil",
     "settings": "Ayarlar"
+  },
+  "chat": {
+    "title": "AI Sanat Asistanı",
+    "description": "Sanat eserlerinizi analiz edin, öneriler alın ve yeni fikirler keşfedin",
+    "uploadImage": "Resim Yükle",
+    "analyze": "Analiz Et",
+    "describe": "Açıkla",
+    "askAboutArt": "Sanat hakkında bir soru sorun...",
+    "send": "Gönder"
+  },
+  "workshop": {
+    "title": "AI Workshop",
+    "description": "Sanat eserlerinizi yapay zeka ile geliştirin ve yeni eserler oluşturun",
+    "enhance": "Geliştir",
+    "create": "Oluştur",
+    "original": "Orijinal Eser",
+    "enhanced": "Geliştirilmiş Eser",
+    "upload": "Resim Yükle",
+    "promptPlaceholder": "Eserinizi nasıl geliştirmek istediğinizi açıklayın...",
+    "noEnhancedImage": "Henüz geliştirilmiş bir eser yok",
+    "share": "Paylaş",
+    "download": "İndir",
+    "comingSoon": "Yakında..."
   },
   "features": {
     "title": "AI Araçlarımız",
@@ -58,12 +89,5 @@
     "followers": "Takipçiler",
     "following": "Takip Edilenler",
     "edit": "Profili Düzenle"
-  },
-  "workshop": {
-    "title": "Workshop",
-    "upload": "Eser Yükle",
-    "analyze": "AI ile Analiz Et",
-    "improve": "Geliştir",
-    "share": "Paylaş"
   }
 }

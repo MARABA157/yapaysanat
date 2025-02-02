@@ -60,10 +60,26 @@
     "edit": "Edit Profile"
   },
   "workshop": {
-    "title": "Workshop",
-    "upload": "Upload Work",
-    "analyze": "Analyze with AI",
-    "improve": "Improve",
-    "share": "Share"
+    "title": "AI Workshop",
+    "description": "Enhance your artworks with AI and create new ones",
+    "enhance": "Enhance",
+    "create": "Create",
+    "original": "Original Artwork",
+    "enhanced": "Enhanced Artwork",
+    "upload": "Upload Image",
+    "promptPlaceholder": "Describe how you want to enhance your artwork...",
+    "noEnhancedImage": "No enhanced artwork yet",
+    "share": "Share",
+    "download": "Download",
+    "comingSoon": "Coming Soon..."
+  },
+  "chat": {
+    "title": "AI Art Assistant",
+    "description": "Analyze your artworks, get suggestions, and discover new ideas",
+    "uploadImage": "Upload Image",
+    "analyze": "Analyze",
+    "describe": "Describe",
+    "askAboutArt": "Ask something about art...",
+    "send": "Send"
   }
 }
