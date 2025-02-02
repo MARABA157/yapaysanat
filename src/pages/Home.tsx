@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Globe2, Sparkles, Zap } from 'lucide-react';
 
