@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { GalleryFilters } from '@/components/gallery/GalleryFilters';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { ErrorFallback } from '@/components/common/ErrorFallback';
-import { supabase } from '@/lib/supabase';
+import GalleryFilters from '@/components/gallery/GalleryFilters';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorFallback from '@/components/common/ErrorFallback';
+import supabase from '@/lib/supabase';
 import { Artwork } from '@/types/supabase';
 import { useToast } from '@/components/ui/use-toast';
 

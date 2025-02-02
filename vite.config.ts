@@ -10,7 +10,12 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react({
         jsxRuntime: 'automatic',
-        jsxImportSource: 'react'
+        jsxImportSource: 'react',
+        babel: {
+          plugins: [
+            ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
+          ]
+        }
       }),
     ],
     resolve: {
@@ -52,7 +57,8 @@ export default defineConfig(({ mode }) => {
           if (warning.code === 'EVAL' || 
               warning.code === 'SOURCEMAP_ERROR' || 
               warning.code === 'THIS_IS_UNDEFINED' ||
-              warning.code === 'MISSING_EXPORT') return;
+              warning.code === 'MISSING_EXPORT' ||
+              warning.code === 'PURE_COMMENT_HAS_INVALID_POSITION') return;
           warn(warning);
         }
       },
@@ -67,7 +73,8 @@ export default defineConfig(({ mode }) => {
       terserOptions: {
         compress: {
           drop_console: true,
-          drop_debugger: true
+          drop_debugger: true,
+          pure_funcs: ['console.log']
         }
       }
     },
