@@ -10,16 +10,16 @@ import { AutoTrainer } from '@/services/ai/AutoTrainer';
 // Pages
 import Home from '@/pages/Home';
 import Gallery from '@/pages/Gallery';
-import AiArt from '@/pages/AiArt';
-import AiAudio from '@/pages/AiAudio';
+import Art from '@/pages/ai/Art';
+import Audio from '@/pages/ai/Audio';
 import Chat from '@/pages/ai/Chat';
-import AiVideo from '@/pages/AiVideo';
+import Video from '@/pages/ai/Video';
 import Competitions from '@/pages/Competitions';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import Search from '@/pages/Search';
 import StyleTransfer from '@/pages/ai/StyleTransfer';
-import GenerateArt from '@/pages/ai/GenerateArt';
+import GenerateArt from '@/pages/ai/Generate';
 import VideoGenerate from '@/pages/ai/VideoGenerate';
 import ArtistProfile from '@/pages/artist/[id]';
 import Premium from '@/pages/Premium';
@@ -75,10 +75,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/gallery/*" element={<Gallery />} />
-        <Route path="/ai/art" element={<AiArt />} />
-        <Route path="/ai/audio" element={<AiAudio />} />
+        <Route path="/ai/art" element={<Art />} />
+        <Route path="/ai/audio" element={<Audio />} />
         <Route path="/ai/chat" element={<Chat />} />
-        <Route path="/ai/video" element={<AiVideo />} />
+        <Route path="/ai/video" element={<Video />} />
         <Route path="/competitions" element={<Competitions />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
