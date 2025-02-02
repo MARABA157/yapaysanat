@@ -11,6 +11,11 @@ export default defineConfig(({ mode }) => {
       react({
         jsxRuntime: 'automatic',
         jsxImportSource: 'react',
+        babel: {
+          plugins: [
+            ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
+          ]
+        }
       }),
     ],
     resolve: {
@@ -30,11 +35,15 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            'next-themes': ['next-themes']
+            'next-themes': ['next-themes'],
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
           }
         },
         onwarn(warning, warn) {
-          if (warning.code === 'EVAL' || warning.code === 'SOURCEMAP_ERROR') return;
+          if (warning.code === 'EVAL' || 
+              warning.code === 'SOURCEMAP_ERROR' || 
+              warning.code === 'THIS_IS_UNDEFINED') return;
           warn(warning);
         }
       },
@@ -42,11 +51,29 @@ export default defineConfig(({ mode }) => {
         transformMixedEsModules: true,
         include: [/node_modules/],
         exclude: [/node_modules\/next-themes/]
+      },
+      target: 'es2015',
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        }
       }
     },
     envDir: '.', // .env dosyalarının okunacağı dizin
     optimizeDeps: {
-      include: ['react', 'react-dom', 'next-themes'],
+      include: [
+        'react', 
+        'react-dom', 
+        'react-router-dom',
+        'next-themes',
+        '@radix-ui/react-icons',
+        '@radix-ui/react-slot',
+        'class-variance-authority',
+        'clsx',
+        'tailwind-merge'
+      ],
       exclude: []
     },
     define: {
