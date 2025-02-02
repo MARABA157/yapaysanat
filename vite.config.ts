@@ -34,12 +34,19 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       sourcemap: true,
       rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'EVAL' || 
+              warning.code === 'SOURCEMAP_ERROR' || 
+              warning.code === 'THIS_IS_UNDEFINED' ||
+              warning.code === 'MISSING_EXPORT' ||
+              warning.code === 'PURE_COMMENT_HAS_INVALID_POSITION') return;
+          warn(warning);
+        },
         input: {
           main: path.resolve(__dirname, 'index.html')
         },
         output: {
           manualChunks: {
-            'next-themes': ['next-themes'],
             'react-vendor': ['react', 'react-dom'],
             'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
           },
@@ -49,14 +56,6 @@ export default defineConfig(({ mode }) => {
             constBindings: true,
             objectShorthand: true
           }
-        },
-        onwarn(warning, warn) {
-          if (warning.code === 'EVAL' || 
-              warning.code === 'SOURCEMAP_ERROR' || 
-              warning.code === 'THIS_IS_UNDEFINED' ||
-              warning.code === 'MISSING_EXPORT' ||
-              warning.code === 'PURE_COMMENT_HAS_INVALID_POSITION') return;
-          warn(warning);
         },
         preserveEntrySignatures: 'strict',
         treeshake: {
@@ -96,7 +95,6 @@ export default defineConfig(({ mode }) => {
         'react', 
         'react-dom', 
         'react-router-dom',
-        'next-themes',
         '@radix-ui/react-icons',
         '@radix-ui/react-slot',
         'class-variance-authority',

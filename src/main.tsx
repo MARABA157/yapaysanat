@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import App from './App';
 import './index.css';
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
