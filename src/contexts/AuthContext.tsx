@@ -7,6 +7,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,7 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     signIn,
     signOut,
-    loading
+    loading,
+    isAuthenticated: user !== null
   };
 
   return (

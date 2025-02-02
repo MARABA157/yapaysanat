@@ -204,17 +204,34 @@ export interface Database {
 }
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
-export type Artwork = Database['public']['Tables']['artworks']['Row'] & {
+
+export interface Collection {
+  id: string;
+  name: string;
+  cover_image: string;
+  featured: boolean;
+  artwork_count: number;
+  user?: Profile;
+  artworks?: Artwork[];
+}
+
+export interface Artwork {
+  id: string;
+  title: string;
+  description?: string;
+  image_url: string;
+  user_id: string;
+  artist: string;
+  likes: number;
+  comments: number;
+  views: number;
   user?: Profile;
   stats?: {
     like_count: number;
     comment_count: number;
     view_count: number;
-  };
-};
-export type Collection = Database['public']['Tables']['collections']['Row'] & {
-  user?: Profile;
-  artworks?: Artwork[];
-};
+  }
+}
+
 export type CollectionArtwork = Database['public']['Tables']['collection_artworks']['Row'];
 export type ArtworkStats = Database['public']['Tables']['artwork_stats']['Row'];
