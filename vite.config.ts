@@ -57,6 +57,7 @@ export default defineConfig(({ mode }) => {
             objectShorthand: true
           }
         },
+        external: ['styled-components'],
         preserveEntrySignatures: 'strict',
         treeshake: {
           moduleSideEffects: true,
