@@ -12,7 +12,14 @@ export default defineConfig(({ mode }) => {
         jsxImportSource: '@emotion/react',
         babel: {
           plugins: [
-            'babel-plugin-styled-components'
+            [
+              'babel-plugin-styled-components',
+              {
+                displayName: true,
+                fileName: false,
+                pure: true
+              }
+            ]
           ]
         }
       }),
@@ -20,7 +27,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
-        'styled-components': 'styled-components/dist/styled-components.js'
+        'styled-components': path.resolve(__dirname, 'node_modules/styled-components')
       },
       dedupe: ['react', 'react-dom']
     },
@@ -55,6 +62,9 @@ export default defineConfig(({ mode }) => {
             arrowFunctions: true,
             constBindings: true,
             objectShorthand: true
+          },
+          globals: {
+            'styled-components': 'styled'
           }
         },
         external: ['styled-components'],
