@@ -9,6 +9,12 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  defaultTheme?: ThemeMode;
+  storageKey?: string;
+}
+
 const ThemeContext = createContext<ThemeContextType>({
   mode: 'light',
   toggleTheme: () => {},
@@ -16,15 +22,19 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export const useTheme = () => useContext(ThemeContext);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('light');
+export function ThemeProvider({ 
+  children, 
+  defaultTheme = 'light',
+  storageKey = 'theme-mode' 
+}: ThemeProviderProps) {
+  const [mode, setMode] = useState<ThemeMode>(defaultTheme);
 
   useEffect(() => {
-    const savedMode = localStorage.getItem('theme-mode') as ThemeMode;
+    const savedMode = localStorage.getItem(storageKey) as ThemeMode;
     if (savedMode) {
       setMode(savedMode);
     }
-  }, []);
+  }, [storageKey]);
 
   const theme = useMemo(
     () =>
@@ -39,7 +49,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     const newMode = mode === 'light' ? 'dark' : 'light';
     setMode(newMode);
-    localStorage.setItem('theme-mode', newMode);
+    localStorage.setItem(storageKey, newMode);
   };
 
   return (

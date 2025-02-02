@@ -83,7 +83,7 @@ const cities = [
   }
 ];
 
-export const Hero: React.FC = () => {
+export default function Hero() {
   const [currentCityIndex, setCurrentCityIndex] = React.useState(0);
 
   React.useEffect(() => {

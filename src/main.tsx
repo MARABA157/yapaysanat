@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { ThemeProvider } from '@/providers/ThemeProvider'
-import { StyleSheetManager } from 'styled-components'
+import { ThemeProvider } from '@/contexts/ThemeContext'
+import CssBaseline from '@mui/material/CssBaseline'
 import App from './App'
 import './index.css'
 
@@ -16,16 +16,15 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <StyleSheetManager enableVendorPrefixes>
-      <HelmetProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-              <App />
-            </ThemeProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </HelmetProvider>
-    </StyleSheetManager>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ThemeProvider defaultTheme="light" storageKey="sanat-galerisi-theme">
+            <CssBaseline />
+            <App />
+          </ThemeProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>
 )

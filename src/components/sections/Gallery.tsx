@@ -176,7 +176,7 @@ const artworks = [
   }
 ];
 
-export const Gallery: React.FC = () => {
+export default function Gallery() {
   const [visibleArtworks, setVisibleArtworks] = useState<Artwork[]>([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [page, setPage] = useState(1);

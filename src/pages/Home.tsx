@@ -1,11 +1,8 @@
-import { Suspense, lazy, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { Suspense } from 'react';
 import { Loader2, Globe2, Sparkles, Zap } from 'lucide-react';
-
-// Lazy loaded components
-const Hero = lazy(() => import('@/components/sections/Hero'));
-const Features = lazy(() => import('@/components/sections/Features'));
-const Gallery = lazy(() => import('@/components/sections/Gallery'));
+import Hero from '@/components/sections/Hero';
+import Features from '@/components/sections/Features';
+import Gallery from '@/components/sections/Gallery';
 
 // Loading component with skeleton
 const SectionLoader = () => (
@@ -91,33 +88,8 @@ const artworks = [
 ];
 
 export default function Home() {
-  const [currentCityIndex, setCurrentCityIndex] = useState(0);
-  const [currentArtworkIndex, setCurrentArtworkIndex] = useState(0);
-
-  useEffect(() => {
-    // Şehir geçişleri için interval
-    const cityInterval = setInterval(() => {
-      setCurrentCityIndex((prevIndex) => (prevIndex + 1) % cities.length);
-    }, 5000);
-
-    // Sanat eserleri için interval
-    const artworkInterval = setInterval(() => {
-      setCurrentArtworkIndex((prevIndex) => (prevIndex + 1) % artworks.length);
-    }, 3000);
-
-    return () => {
-      clearInterval(cityInterval);
-      clearInterval(artworkInterval);
-    };
-  }, []);
-
   return (
-    <motion.main
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex-1 bg-black"
-    >
+    <main className="flex-1 bg-black">
       <Suspense fallback={<SectionLoader />}>
         <Hero />
       </Suspense>
@@ -129,6 +101,6 @@ export default function Home() {
       <Suspense fallback={<SectionLoader />}>
         <Gallery />
       </Suspense>
-    </motion.main>
+    </main>
   );
 }
