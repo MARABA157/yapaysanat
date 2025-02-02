@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Globe2, Sparkles, Zap } from 'lucide-react';
 
 // Lazy loaded components
 const Hero = lazy(() => import('@/components/sections/Hero'));
