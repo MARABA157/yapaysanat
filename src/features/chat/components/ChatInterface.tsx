@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Send, Bot, User, ImageIcon, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Message, ChatProps } from '../types';
+import { Message, ChatProps } from '../Types';
 
 export function ChatInterface({ mode = 'general', suggestions = [], onSendMessage }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);

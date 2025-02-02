@@ -9,18 +9,18 @@ import { AutoTrainer } from '@/services/ai/AutoTrainer';
 
 // Pages
 import Home from '@/pages/Home';
-import Gallery from '@/pages/gallery';
+import Gallery from '@/pages/Gallery';
 import AiArt from '@/pages/AiArt';
 import AiAudio from '@/pages/AiAudio';
-import Chat from '@/pages/ai/chat';
+import Chat from '@/pages/ai/Chat';
 import AiVideo from '@/pages/AiVideo';
 import Competitions from '@/pages/Competitions';
 import Login from '@/pages/auth/login';
 import Register from '@/pages/auth/register';
-import Search from '@/pages/search';
-import StyleTransfer from '@/pages/ai/style-transfer';
-import GenerateArt from '@/pages/ai/generate';
-import VideoGenerate from '@/pages/ai/video-generate';
+import Search from '@/pages/Search';
+import StyleTransfer from '@/pages/ai/StyleTransfer';
+import GenerateArt from '@/pages/ai/GenerateArt';
+import VideoGenerate from '@/pages/ai/VideoGenerate';
 import ArtistProfile from '@/pages/artist/[id]';
 import Premium from '@/pages/Premium';
 import AdminDashboard from './pages/admin';
