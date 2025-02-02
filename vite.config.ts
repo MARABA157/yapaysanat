@@ -8,28 +8,13 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      react({
-        jsxImportSource: '@emotion/react',
-        babel: {
-          plugins: [
-            [
-              'babel-plugin-styled-components',
-              {
-                displayName: true,
-                fileName: false,
-                pure: true
-              }
-            ]
-          ]
-        }
-      }),
+      react(),
     ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
-        'styled-components': path.resolve(__dirname, 'node_modules/styled-components')
       },
-      dedupe: ['react', 'react-dom', 'styled-components']
+      dedupe: ['react', 'react-dom']
     },
     server: {
       port: 3000,
@@ -53,25 +38,18 @@ export default defineConfig(({ mode }) => {
           main: path.resolve(__dirname, 'index.html')
         },
         output: {
-          paths: {
-            'styled-components': './node_modules/styled-components/dist/styled-components.browser.esm.js'
-          },
           manualChunks: {
             'react-vendor': ['react', 'react-dom'],
-            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge'],
-            'styled': ['styled-components']
+            'ui-vendor': ['@radix-ui/react-icons', '@radix-ui/react-slot', 'class-variance-authority', 'clsx', 'tailwind-merge']
           },
           format: 'es',
           generatedCode: {
             arrowFunctions: true,
             constBindings: true,
             objectShorthand: true
-          },
-          globals: {
-            'styled-components': 'styled'
           }
         },
-        external: ['styled-components'],
+        external: [],
         preserveEntrySignatures: 'strict',
         treeshake: {
           moduleSideEffects: true,
@@ -80,7 +58,7 @@ export default defineConfig(({ mode }) => {
         }
       },
       commonjsOptions: {
-        include: [/styled-components/, /node_modules/],
+        include: [/node_modules/],
         extensions: ['.js', '.cjs', '.jsx', '.tsx', '.ts'],
         strictRequires: true,
         transformMixedEsModules: true,
@@ -116,8 +94,7 @@ export default defineConfig(({ mode }) => {
         'clsx',
         'tailwind-merge',
         'framer-motion',
-        'lucide-react',
-        'styled-components'
+        'lucide-react'
       ],
       exclude: [],
       esbuildOptions: {
