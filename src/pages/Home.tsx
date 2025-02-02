@@ -1,21 +1,11 @@
-import { Suspense } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Bot, Sparkles, Star, Image as ImageIcon, Users, Search, Video, Globe2, Zap, Wand2, Music, MessageSquare, Crown, ShieldCheck } from 'lucide-react';
-import { Footer } from '@/components/Footer';
-import { useEffect, useState } from 'react';
+import { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2 } from 'lucide-react';
 
-// Lazy loaded components with preload
-const Hero = import('@/components/sections/Hero');
-const Features = import('@/components/sections/Features');
-const Gallery = import('@/components/sections/Gallery');
-
-// Preload components
-Promise.all([Hero, Features, Gallery]);
+// Lazy loaded components
+const Hero = lazy(() => import('@/components/sections/Hero'));
+const Features = lazy(() => import('@/components/sections/Features'));
+const Gallery = lazy(() => import('@/components/sections/Gallery'));
 
 // Loading component with skeleton
 const SectionLoader = () => (
@@ -129,24 +119,15 @@ export default function Home() {
       className="flex-1 bg-black"
     >
       <Suspense fallback={<SectionLoader />}>
-        {Hero.then(module => {
-          const HeroComponent = module.default;
-          return <HeroComponent />;
-        })}
+        <Hero />
       </Suspense>
 
       <Suspense fallback={<SectionLoader />}>
-        {Features.then(module => {
-          const FeaturesComponent = module.default;
-          return <FeaturesComponent />;
-        })}
+        <Features />
       </Suspense>
 
       <Suspense fallback={<SectionLoader />}>
-        {Gallery.then(module => {
-          const GalleryComponent = module.default;
-          return <GalleryComponent />;
-        })}
+        <Gallery />
       </Suspense>
     </motion.main>
   );
