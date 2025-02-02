@@ -1,11 +1,11 @@
 import React from 'react';
-import { Categories } from '../../types/artwork';
+import { Categories } from '@/types/artwork';
 
 interface GalleryFiltersProps {
   onCategoryChange: (category: Categories | null) => void;
 }
 
-export default function GalleryFilters({ onCategoryChange }: GalleryFiltersProps) {
+export const GalleryFilters: React.FC<GalleryFiltersProps> = ({ onCategoryChange }) => {
   return (
     <div className="flex flex-wrap gap-2 justify-center">
       <button
@@ -25,4 +25,6 @@ export default function GalleryFilters({ onCategoryChange }: GalleryFiltersProps
       ))}
     </div>
   );
-}
+};
+
+export default GalleryFilters;

@@ -1,33 +1,43 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import GalleryFilters from '@/components/gallery/GalleryFilters';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ErrorFallback from '@/components/common/ErrorFallback';
-import supabase from '@/lib/supabase';
-import { Artwork } from '@/types/supabase';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { ErrorFallback } from '@/components/common/ErrorFallback';
+import { supabase } from '@/lib/supabase';
+import { Artwork, Categories } from '@/types/artwork';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function Gallery() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Categories | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchArtworks();
-  }, []);
+  }, [selectedCategory]);
 
   const fetchArtworks = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      setError(null);
+
+      let query = supabase
         .from('artworks')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*, user:users(id, username, full_name, avatar_url)');
 
-      if (error) throw error;
+      if (selectedCategory) {
+        query = query.eq('category', selectedCategory);
+      }
 
-      setArtworks(data || []);
+      const { data, error: supabaseError } = await query;
+
+      if (supabaseError) {
+        throw supabaseError;
+      }
+
+      setArtworks(data as Artwork[]);
     } catch (err) {
       setError(err as Error);
       toast({
@@ -40,6 +50,10 @@ export default function Gallery() {
     }
   };
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   if (error) {
     return <ErrorFallback error={error} resetErrorBoundary={fetchArtworks} />;
   }
@@ -47,48 +61,33 @@ export default function Gallery() {
   return (
     <>
       <Helmet>
-        <title>Galeri - Sanat Galerisi</title>
-        <meta name="description" content="Sanatçıların eserlerini keşfedin" />
+        <title>Galeri | Sanat</title>
       </Helmet>
-
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Sanat Galerisi</h1>
-        
-        <GalleryFilters />
-
-        {isLoading ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <LoadingSpinner />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {artworks.map((artwork) => (
-              <div
-                key={artwork.id}
-                className="bg-card rounded-lg shadow-md overflow-hidden"
-              >
-                <img
-                  src={artwork.image_url}
-                  alt={artwork.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">{artwork.title}</h3>
-                  <p className="text-muted-foreground">{artwork.description}</p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(artwork.created_at).toLocaleDateString()}
-                    </span>
-                    <span className="text-sm font-medium">
-                      {artwork.artist_name}
-                    </span>
-                  </div>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-center mb-8">Galeri</h1>
+        <GalleryFilters onCategoryChange={setSelectedCategory} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+          {artworks.map((artwork) => (
+            <div
+              key={artwork.id}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+            >
+              <img
+                src={artwork.image_url}
+                alt={artwork.title}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{artwork.title}</h3>
+                <p className="text-gray-600 text-sm mb-2">{artwork.description}</p>
+                <div className="flex items-center text-sm text-gray-500">
+                  <span>Sanatçı: {artwork.user.full_name || artwork.user.username}</span>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </main>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
