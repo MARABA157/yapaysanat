@@ -1,8 +1,142 @@
-import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
+import { theme } from '../../styles/theme';
+import Masonry from 'react-masonry-css';
+
+const GalleryContainer = styled.section`
+  padding: ${theme.spacing.xxl} 0;
+  background: ${theme.colors.primary.white};
+`;
+
+const GalleryHeader = styled.div`
+  text-align: center;
+  margin-bottom: ${theme.spacing.xxl};
+`;
+
+const GalleryTitle = styled(motion.h2)`
+  color: ${theme.colors.accent.darkGray};
+  margin-bottom: ${theme.spacing.lg};
+`;
+
+const GalleryDescription = styled(motion.p)`
+  color: ${theme.colors.accent.darkGray};
+  max-width: 600px;
+  margin: 0 auto;
+`;
+
+const MasonryGrid = styled(Masonry)`
+  display: flex;
+  width: 100%;
+  gap: ${theme.spacing.md};
+  padding: 0 ${theme.spacing.xl};
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing.md};
+  }
+`;
+
+const ArtworkCard = styled(motion.div)`
+  position: relative;
+  border-radius: ${theme.layout.radius.lg};
+  overflow: hidden;
+  cursor: pointer;
+
+  &:hover {
+    .artwork-info {
+      opacity: 1;
+    }
+  }
+`;
+
+const ArtworkImage = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform ${theme.transitions.medium};
+
+  ${ArtworkCard}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const ArtworkInfo = styled(motion.div)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: ${theme.spacing.lg};
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0)
+  );
+  color: ${theme.colors.primary.white};
+  opacity: 0;
+  transition: opacity ${theme.transitions.medium};
+  class-name: "artwork-info";
+`;
+
+const ArtworkTitle = styled.h3`
+  font-size: ${theme.typography.body.sizes.regular};
+  font-weight: ${theme.typography.body.weights.bold};
+  margin-bottom: ${theme.spacing.xs};
+`;
+
+const ArtworkArtist = styled.p`
+  font-size: ${theme.typography.body.sizes.small};
+  opacity: 0.8;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: ${theme.spacing.md};
+  margin-bottom: ${theme.spacing.xl};
+  flex-wrap: wrap;
+  padding: 0 ${theme.spacing.xl};
+`;
+
+const FilterButton = styled(motion.button)<{ isActive: boolean }>`
+  padding: ${theme.spacing.sm} ${theme.spacing.lg};
+  border-radius: ${theme.layout.radius.full};
+  background: ${props => props.isActive ? theme.colors.primary.gold : theme.colors.accent.softGray};
+  color: ${props => props.isActive ? theme.colors.primary.white : theme.colors.accent.darkGray};
+  font-weight: ${theme.typography.body.weights.medium};
+  transition: all ${theme.transitions.fast};
+
+  &:hover {
+    background: ${props => props.isActive ? theme.colors.primary.gold : theme.colors.accent.pastelBlue};
+    transform: ${theme.effects.hover.scale};
+  }
+`;
+
+const LoadMoreButton = styled(motion.button)`
+  display: block;
+  margin: ${theme.spacing.xl} auto 0;
+  padding: ${theme.spacing.md} ${theme.spacing.xl};
+  background: ${theme.colors.primary.gold};
+  color: ${theme.colors.primary.white};
+  border-radius: ${theme.layout.radius.full};
+  font-weight: ${theme.typography.body.weights.bold};
+`;
+
+interface Artwork {
+  id: string;
+  title: string;
+  artist: string;
+  image: string;
+  category: string;
+}
+
+const breakpointColumns = {
+  default: 4,
+  1100: 3,
+  700: 2,
+  500: 1
+};
 
 const artworks = [
   {
@@ -42,143 +176,98 @@ const artworks = [
   }
 ];
 
-export default function Gallery() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+export const Gallery: React.FC = () => {
+  const [visibleArtworks, setVisibleArtworks] = useState<Artwork[]>([]);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 12;
 
-  // Otomatik kaydırma
+  const filters = [
+    { id: 'all', label: 'Tümü' },
+    { id: 'painting', label: 'Resim' },
+    { id: 'digital', label: 'Dijital' },
+    { id: 'sculpture', label: 'Heykel' },
+    { id: 'photography', label: 'Fotoğraf' },
+  ];
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % artworks.length);
-    }, 5000); // Her 5 saniyede bir değiştir
+    const filtered = artworks.filter(
+      artwork => activeFilter === 'all' || artwork.category === activeFilter
+    );
+    setVisibleArtworks(filtered.slice(0, page * itemsPerPage));
+  }, [activeFilter, page]);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  // Önceden yükle
-  useEffect(() => {
-    const nextIndex = (currentIndex + 1) % artworks.length;
-    const prevIndex = (currentIndex - 1 + artworks.length) % artworks.length;
-    
-    [currentIndex, nextIndex, prevIndex].forEach(index => {
-      const img = new Image();
-      img.src = artworks[index].image;
-      img.onload = () => {
-        setLoadedImages(prev => new Set(prev).add(index));
-        if (index === currentIndex) setIsLoading(false);
-      };
-    });
-  }, [currentIndex]);
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % artworks.length);
-  }, []);
-
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + artworks.length) % artworks.length);
-  }, []);
-
-  const currentArtwork = artworks[currentIndex];
+  const loadMore = () => {
+    setPage(prev => prev + 1);
+  };
 
   return (
-    <section className="py-24 bg-black relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(100,50,255,0.1),transparent_50%)]" />
-      
-      <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
+    <GalleryContainer>
+      <GalleryHeader>
+        <GalleryTitle
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400">
-            Keşfet
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Sanatçılarımızın en beğenilen eserleri
-          </p>
-        </motion.div>
+          Keşfet
+        </GalleryTitle>
+        <GalleryDescription
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          En yeni ve etkileyici sanat eserlerini keşfedin. AI destekli galeri deneyimi ile sanata yeni bir bakış açısı kazanın.
+        </GalleryDescription>
+      </GalleryHeader>
 
-        <div className="relative max-w-4xl mx-auto">
-          <div className="aspect-[16/9] relative overflow-hidden rounded-2xl bg-gray-900 border border-violet-500/20">
-            {/* Görsel */}
-            <motion.img
-              key={currentArtwork.id}
-              src={currentArtwork.image}
-              alt={currentArtwork.title}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                loadedImages.has(currentIndex) ? 'opacity-100' : 'opacity-0'
-              }`}
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            />
+      <FilterContainer>
+        {filters.map(filter => (
+          <FilterButton
+            key={filter.id}
+            isActive={activeFilter === filter.id}
+            onClick={() => setActiveFilter(filter.id)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {filter.label}
+          </FilterButton>
+        ))}
+      </FilterContainer>
 
-            {/* Yükleme göstergesi */}
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-                <div className="w-8 h-8 border-4 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
-              </div>
-            )}
-
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-            {/* Bilgi kartı */}
-            <motion.div
+      <MasonryGrid
+        breakpointCols={breakpointColumns}
+        className="masonry-grid"
+        columnClassName="masonry-grid_column"
+      >
+        <AnimatePresence>
+          {visibleArtworks.map((artwork, index) => (
+            <ArtworkCard
+              key={artwork.id}
+              as={motion.div}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="absolute bottom-0 left-0 right-0 p-8"
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <div className="flex flex-col items-center text-white">
-                <span className="text-sm text-violet-400 mb-2">{currentArtwork.category}</span>
-                <h3 className="text-2xl font-bold mb-2">{currentArtwork.title}</h3>
-                <p className="text-gray-300">{currentArtwork.artist}</p>
-              </div>
-            </motion.div>
-          </div>
+              <ArtworkImage src={artwork.image} alt={artwork.title} loading="lazy" />
+              <ArtworkInfo>
+                <ArtworkTitle>{artwork.title}</ArtworkTitle>
+                <ArtworkArtist>{artwork.artist}</ArtworkArtist>
+              </ArtworkInfo>
+            </ArtworkCard>
+          ))}
+        </AnimatePresence>
+      </MasonryGrid>
 
-          {/* Navigasyon butonları */}
-          <div className="absolute top-1/2 -translate-y-1/2 left-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlePrev}
-              className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 hover:bg-black/70 transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6 text-white" />
-            </Button>
-          </div>
-          <div className="absolute top-1/2 -translate-y-1/2 right-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNext}
-              className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 hover:bg-black/70 transition-colors"
-            >
-              <ArrowRight className="w-6 h-6 text-white" />
-            </Button>
-          </div>
-
-          {/* Küçük resimler */}
-          <div className="flex justify-center gap-2 mt-4">
-            {artworks.map((artwork, index) => (
-              <button
-                key={artwork.id}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex 
-                    ? 'bg-violet-500 w-8' 
-                    : 'bg-gray-600 hover:bg-gray-500'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+      {visibleArtworks.length < artworks.length && (
+        <LoadMoreButton
+          onClick={loadMore}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Daha Fazla Yükle
+        </LoadMoreButton>
+      )}
+    </GalleryContainer>
   );
-}
+};

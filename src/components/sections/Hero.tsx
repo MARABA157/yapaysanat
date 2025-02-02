@@ -1,8 +1,69 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import styled from 'styled-components';
+import { theme } from '../../styles/theme';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Globe2 } from 'lucide-react';
+
+const HeroContainer = styled.section`
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${theme.colors.gradient.dark};
+`;
+
+const HeroContent = styled.div`
+  text-align: center;
+  color: ${theme.colors.primary.white};
+  z-index: 2;
+  padding: ${theme.spacing.xl};
+`;
+
+const HeroTitle = styled(motion.h1)`
+  font-size: 72px;
+  margin-bottom: ${theme.spacing.lg};
+  background: ${theme.colors.gradient.primary};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @media (max-width: ${theme.breakpoints.tablet}) {
+    font-size: 48px;
+  }
+`;
+
+const HeroSubtitle = styled(motion.p)`
+  font-size: ${theme.typography.accent.size};
+  margin-bottom: ${theme.spacing.xl};
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const HeroButton = styled(motion.button)`
+  padding: ${theme.spacing.md} ${theme.spacing.xl};
+  background: ${theme.colors.primary.gold};
+  color: ${theme.colors.primary.white};
+  border-radius: ${theme.layout.radius.full};
+  font-weight: ${theme.typography.body.weights.bold};
+  font-size: ${theme.typography.body.sizes.regular};
+  
+  &:hover {
+    transform: ${theme.effects.hover.scale};
+    box-shadow: ${theme.shadows.lg};
+  }
+`;
+
+const BackgroundParticles = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  opacity: 0.5;
+`;
 
 const cities = [
   {
@@ -22,10 +83,10 @@ const cities = [
   }
 ];
 
-export default function Hero() {
-  const [currentCityIndex, setCurrentCityIndex] = useState(0);
+export const Hero: React.FC = () => {
+  const [currentCityIndex, setCurrentCityIndex] = React.useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentCityIndex((prev) => (prev + 1) % cities.length);
     }, 5000);
@@ -34,8 +95,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Transition */}
+    <HeroContainer>
       {cities.map((city, index) => (
         <motion.div
           key={city.name}
@@ -63,52 +123,48 @@ export default function Hero() {
           </div>
         </motion.div>
       ))}
+      <BackgroundParticles
+        animate={{
+          background: [
+            'radial-gradient(circle, #FFD700 1px, transparent 1px)',
+            'radial-gradient(circle, #FFA500 1px, transparent 1px)',
+          ],
+          backgroundSize: ['50px 50px', '30px 30px'],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          repeatType: 'reverse',
+        }}
+      />
 
-      {/* Content */}
-      <div className="container relative z-10">
-        <div className="grid grid-cols-1 gap-12 items-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-8 text-white text-center"
-          >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-              SANAT GALERİSİ
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500">
-                Dijital Geleceği
-              </span>
-            </h1>
-            <p className="text-xl text-white/80 max-w-xl mx-auto">
-              Yapay zeka destekli platformumuzda global sanat ağına katılın ve 
-              sanatın geleceğini keşfedin.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link to="/explore">
-                <Button size="lg" variant="outline" className="gap-2 border-white/20 bg-white/10 hover:bg-white/20 text-white">
-                  Keşfet <Globe2 className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-2"
+      <HeroContent>
+        <HeroTitle
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 h-1 rounded-full bg-white"
-          />
-        </motion.div>
-      </div>
-    </section>
+          Sanat ve Yapay Zeka
+        </HeroTitle>
+
+        <HeroSubtitle
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          Yapay zeka ile sanatın sınırlarını keşfedin. Yeni nesil sanat galerisi deneyimi için hoş geldiniz.
+        </HeroSubtitle>
+
+        <HeroButton
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          Keşfetmeye Başla
+        </HeroButton>
+      </HeroContent>
+    </HeroContainer>
   );
-}
+};
