@@ -4,8 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/theme-provider';
-import { RouterProvider } from 'react-router-dom';
-import router from '@/routes';
+import { App } from '@/App';
 import '@/index.css';
 
 const root = document.getElementById('root') as HTMLElement
@@ -18,9 +17,9 @@ ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <HelmetProvider>
       <AuthProvider>
-        <ThemeProvider defaultTheme="light" storageKey="sanat-galerisi-theme">
+        <ThemeProvider defaultTheme="dark" storageKey="sanat-galerisi-theme">
           <BrowserRouter>
-            <RouterProvider router={router} />
+            <App />
           </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>

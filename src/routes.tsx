@@ -1,61 +1,8 @@
-import { createBrowserRouter, Routes, Route } from 'react-router-dom';
-import { App } from './App';
+import { Routes, Route } from 'react-router-dom';
 import { Home } from '@/pages/Home';
-import { Explore } from '@/pages/explore/Explore';
-import { ProfilePage } from '@/pages/ProfilePage';
-import { Settings } from '@/pages/Settings';
-import { Login } from '@/pages/auth/Login';
-import { Register } from '@/pages/auth/Register';
-import { ArtworkDetail } from '@/pages/artwork/ArtworkDetail';
-import { NotFound } from '@/pages/NotFound';
 import Gallery from '@/pages/Gallery';
 import Profile from '@/pages/Profile';
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />,
-    errorElement: <NotFound />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: '/explore',
-        element: <Explore />,
-      },
-      {
-        path: '/profile/:id',
-        element: <ProfilePage />,
-      },
-      {
-        path: '/settings',
-        element: <Settings />,
-      },
-      {
-        path: '/login',
-        element: <Login />,
-      },
-      {
-        path: '/register',
-        element: <Register />,
-      },
-      {
-        path: '/artwork/:id',
-        element: <ArtworkDetail />,
-      },
-      {
-        path: '/gallery',
-        element: <Gallery />,
-      },
-      {
-        path: '/profile',
-        element: <Profile />,
-      },
-    ],
-  },
-]);
+import { NotFound } from '@/pages/NotFound';
 
 export function AppRoutes() {
   return (
@@ -63,8 +10,7 @@ export function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
-
-export default router;
