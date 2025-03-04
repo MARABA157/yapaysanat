@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, User, Send, Loader2, ImageIcon, RefreshCcw } from 'lucide-react';
+import { ollamaService } from '@/services/ollamaService';
 
 interface Message {
   id: string;
@@ -38,22 +39,26 @@ export function ChatInterface({ mode, suggestions, onSendMessage }: ChatInterfac
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    onSendMessage(input, imageUpload);
     setInput('');
     setImageUpload(null);
     setIsLoading(true);
 
-    // Simüle edilmiş AI yanıtı
-    setTimeout(() => {
+    try {
+      const response = await ollamaService.chat(input);
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Bu bir örnek AI yanıtıdır. Gerçek API entegrasyonu yapılacak.',
+        content: response.response,
         role: 'assistant',
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('AI yanıtı alınamadı:', error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -47,6 +47,21 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
   const { user } = useAuth()
   const { toast } = useToast()
 
+  const [preview, setPreview] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setCoverImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,6 +82,7 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
         description: values.description,
         is_private: values.isPrivate,
         user_id: user.id,
+        cover_image: coverImage,
       })
 
       if (error) throw error
@@ -152,6 +168,36 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="coverImage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kapak Görseli</FormLabel>
+                  <FormControl>
+                    <Input 
+                      id="cover" 
+                      type="file" 
+                      accept="image/*"
+                      onChange={(e) => {
+                        handleImageChange(e);
+                        field.onChange(e);
+                      }}
+                    />
+                  </FormControl>
+                  {preview && (
+                    <div className="mt-2">
+                      <img 
+                        src={preview} 
+                        alt="Önizleme" 
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
                 </FormItem>
               )}
             />

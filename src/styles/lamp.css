@@ -1,0 +1,51 @@
+.lamp {
+  position: relative;
+  cursor: pointer;
+}
+
+.lamp::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2.5rem;
+  height: 2.5rem;
+  background: radial-gradient(circle, rgba(255, 244, 180, 0.4) 0%, rgba(255, 244, 180, 0) 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lamp:hover::after {
+  opacity: 1;
+}
+
+.lamp.dark {
+  filter: drop-shadow(0 0 8px rgba(255, 244, 180, 0.5));
+}
+
+.lamp.light {
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes glow {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.lamp.dark .icon {
+  color: #ffd700;
+  animation: glow 2s ease-in-out infinite;
+}
+
+.lamp.light .icon {
+  color: #4a5568;
+}

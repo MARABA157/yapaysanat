@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Eye, EyeOff, UserPlus, ArrowRight, Loader2, Camera, Sparkles, Palette, Music, PartyPopper } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase'; // Import yolunu düzeltme
 import { useDropzone } from 'react-dropzone';
 import confetti from 'canvas-confetti';
 

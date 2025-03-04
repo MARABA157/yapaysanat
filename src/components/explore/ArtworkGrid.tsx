@@ -6,6 +6,12 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { toast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Database } from '@/types/supabase';
+import { useInView } from 'react-intersection-observer';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { HeartIcon } from '@/components/icons/HeartIcon';
+import { MessageCircleIcon } from '@/components/icons/MessageCircleIcon';
+import Masonry from 'react-masonry-css';
 
 type Artwork = Database['public']['Tables']['artworks']['Row'] & {
   likes_count: number;
@@ -51,11 +57,7 @@ export function ArtworkGrid({
     }
   }, [propArtworks]);
 
-  useEffect(() => {
-    setLoading(propLoading || false);
-  }, [propLoading]);
-
-  const fetchArtworks = async (loadMore = false) => {
+  const fetchArtworks = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -64,9 +66,9 @@ export function ArtworkGrid({
         .from('artworks')
         .select(`
           *,
-          user:profiles(username, full_name, avatar_url),
-          likes:likes(count),
-          comments:comments(count)
+          likes_count:likes(count),
+          comments_count:comments(count),
+          user:profiles(username, full_name, avatar_url)
         `)
         .order('created_at', { ascending: false })
         .range((page - 1) * limit, page * limit - 1);
@@ -79,20 +81,14 @@ export function ArtworkGrid({
 
       if (error) throw error;
 
-      const formattedArtworks = data.map((artwork) => ({
-        ...artwork,
-        likes_count: artwork.likes?.[0]?.count || 0,
-        comments_count: artwork.comments?.[0]?.count || 0,
-      }));
-
-      setArtworks(loadMore ? [...artworks, ...formattedArtworks] : formattedArtworks);
-      setHasMore(formattedArtworks.length === limit);
-    } catch (error) {
-      console.error('Error fetching artworks:', error);
-      setError('Eserler yüklenirken bir hata oluştu');
+      setArtworks(prev => [...prev, ...(data as Artwork[])]);
+      setHasMore(data.length === limit);
+      setPage(prev => prev + 1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bir hata oluştu');
       toast({
         title: 'Hata',
-        description: 'Eserler yüklenirken bir hata oluştu',
+        description: 'Eserler yüklenirken bir hata oluştu.',
         variant: 'destructive',
       });
     } finally {
@@ -100,93 +96,150 @@ export function ArtworkGrid({
     }
   };
 
-  const handleLoadMore = () => {
-    setPage((prev) => prev + 1);
-    void fetchArtworks(true);
-  };
-
-  if (loading && !artworks.length) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {Array.from({ length: limit }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="aspect-square rounded-lg"
-          />
-        ))}
-      </div>
-    );
-  }
-
   if (error) {
     return (
-      <div className="text-center text-destructive">
-        <p>{error}</p>
-        <Button onClick={() => void fetchArtworks()} variant="outline" className="mt-4">
-          Tekrar Dene
-        </Button>
+      <div className="text-center py-8">
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
 
-  if (!artworks.length) {
+  const breakpointColumns = {
+    default: 4,
+    1536: 4,
+    1280: 3,
+    1024: 3,
+    768: 2,
+    640: 1
+  };
+
+  const [observer, setObserver] = useState<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: '20px',
+      threshold: 1.0,
+    };
+
+    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && !loading && hasMore) {
+        void fetchArtworks();
+      }
+    };
+
+    const obs = new IntersectionObserver(handleIntersect, options);
+    setObserver(obs);
+
+    return () => {
+      if (obs) {
+        obs.disconnect();
+      }
+    };
+  }, [loading, hasMore]);
+
+  const lastArtworkRef = (node: HTMLElement | null) => {
+    if (observer) {
+      if (node) {
+        observer.observe(node);
+      }
+    }
+  };
+
+  const ArtworkImage = ({ artwork }: { artwork: Artwork }) => {
+    const [imgSrc, setImgSrc] = useState(artwork.image_url);
+    const fallbackImages = [
+      'https://source.unsplash.com/800x600/?artwork',
+      'https://source.unsplash.com/800x600/?painting',
+      'https://source.unsplash.com/800x600/?art'
+    ];
+    const [fallbackIndex, setFallbackIndex] = useState(0);
+
+    const handleImageError = () => {
+      if (fallbackIndex < fallbackImages.length) {
+        setImgSrc(`${fallbackImages[fallbackIndex]}?sig=${artwork.id}`);
+        setFallbackIndex(prev => prev + 1);
+      }
+    };
+
     return (
-      <div className="text-center text-muted-foreground">
-        <p>Henüz eser eklenmemiş</p>
-      </div>
+      <LazyLoadImage
+        src={imgSrc}
+        alt={artwork.title || 'Sanat Eseri'}
+        effect="blur"
+        className="w-full h-full object-cover rounded-lg transform transition-transform duration-300 group-hover:scale-105"
+        onError={handleImageError}
+        placeholder={
+          <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse rounded-lg" />
+        }
+      />
     );
-  }
+  };
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {artworks.map((artwork) => (
-          <Link
-            key={artwork.id}
-            to={`/artwork/${artwork.id}`}
-            className="group relative aspect-square overflow-hidden rounded-lg bg-muted"
-          >
-            <img
-              src={artwork.image_url}
-              alt={artwork.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-white font-medium truncate">{artwork.title}</h3>
-                <p className="text-white/80 text-sm truncate">
-                  {artwork.user.full_name}
-                </p>
-                <div className="flex items-center space-x-4 mt-2">
-                  <span className="text-white/80 text-sm">
-                    {artwork.likes_count} beğeni
-                  </span>
-                  <span className="text-white/80 text-sm">
-                    {artwork.comments_count} yorum
-                  </span>
-                </div>
-              </div>
+      <Masonry
+        breakpointCols={breakpointColumns}
+        className="flex w-auto -ml-4"
+        columnClassName="pl-4 bg-clip-padding"
+      >
+        {loading ? (
+          Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="mb-4">
+              <div className="aspect-[4/3] rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 animate-pulse" />
             </div>
-          </Link>
-        ))}
-      </div>
-      {showLoadMore && hasMore && (
+          ))
+        ) : (
+          artworks.map((artwork, index) => (
+            <div
+              key={artwork.id}
+              ref={index === artworks.length - 1 ? lastArtworkRef : null}
+              className="mb-4"
+            >
+              <Link
+                to={`/artwork/${artwork.id}`}
+                className="group relative block overflow-hidden rounded-lg bg-muted hover:shadow-lg transition-all duration-300"
+              >
+                <ArtworkImage artwork={artwork} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3 className="text-white font-semibold truncate">{artwork.title}</h3>
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center space-x-2">
+                        <img
+                          src={artwork.user?.avatar_url || '/default-avatar.png'}
+                          alt={artwork.user?.username || 'Kullanıcı'}
+                          className="w-6 h-6 rounded-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = '/default-avatar.png';
+                          }}
+                        />
+                        <span className="text-white/90 text-sm">{artwork.user?.username}</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-1">
+                          <HeartIcon className="w-4 h-4 text-white/90" />
+                          <span className="text-white/90 text-sm">{artwork.likes_count}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <MessageCircleIcon className="w-4 h-4 text-white/90" />
+                          <span className="text-white/90 text-sm">{artwork.comments_count}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))
+        )}
+      </Masonry>
+
+      {loading && (
         <div className="flex justify-center">
-          <Button
-            onClick={handleLoadMore}
-            variant="outline"
-            disabled={loading}
-            className="min-w-[200px]"
-          >
-            {loading ? (
-              <>
-                <LoadingSpinner className="mr-2" />
-                Yükleniyor...
-              </>
-            ) : (
-              'Daha Fazla'
-            )}
-          </Button>
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
     </div>

@@ -5,8 +5,8 @@ import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import CssBaseline from '@mui/material/CssBaseline'
-import App from './App'
-import './index.css'
+import App from '@/App'
+import '@/index.css'
 
 const root = document.getElementById('root') as HTMLElement
 
@@ -16,15 +16,15 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <HelmetProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <HelmetProvider>
         <AuthProvider>
           <ThemeProvider defaultTheme="light" storageKey="sanat-galerisi-theme">
             <CssBaseline />
             <App />
           </ThemeProvider>
         </AuthProvider>
-      </BrowserRouter>
-    </HelmetProvider>
+      </HelmetProvider>
+    </BrowserRouter>
   </React.StrictMode>
 )

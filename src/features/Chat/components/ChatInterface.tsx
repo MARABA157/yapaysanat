@@ -83,8 +83,8 @@ export function ChatInterface({ mode = 'general', suggestions = [], onSendMessag
               <div
                 className={`rounded-lg p-3 max-w-[80%] ${
                   message.role === 'assistant'
-                    ? 'bg-secondary'
-                    : 'bg-primary text-primary-foreground'
+                    ? 'bg-white/10 text-white'
+                    : 'bg-primary text-white'
                 }`}
               >
                 <p className="text-sm">{message.content}</p>
@@ -112,56 +112,47 @@ export function ChatInterface({ mode = 'general', suggestions = [], onSendMessag
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-white/10">
+        <div className="flex gap-2">
+          <Input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Mesajınızı yazın..."
+            className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+          />
+          <Button 
+            type="submit" 
+            size="icon"
+            className="bg-white/10 hover:bg-white/20 text-white"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
         {suggestions.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {suggestions.map((suggestion, index) => (
               <Button
                 key={index}
                 variant="outline"
                 size="sm"
-                onClick={() => setInput(suggestion)}
+                className="text-sm border-white/20 text-white hover:bg-white/10"
+                onClick={() => {
+                  setInput(suggestion);
+                  inputRef.current?.focus();
+                }}
               >
                 {suggestion}
               </Button>
             ))}
           </div>
         )}
-        
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <Input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Mesajınızı yazın..."
-            className="flex-1"
-            disabled={isLoading}
-          />
-          {mode === 'art' && (
-            <Input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="image-upload"
-              onChange={(e) => setImageUpload(e.target.files?.[0] || null)}
-            />
-          )}
-          {mode === 'art' && (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => document.getElementById('image-upload')?.click()}
-              disabled={isLoading}
-            >
-              <ImageIcon className="h-4 w-4" />
-            </Button>
-          )}
-          <Button type="submit" size="icon" disabled={isLoading}>
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }

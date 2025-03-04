@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 import { theme } from './theme';
 
-export const GlobalStyles = createGlobalStyle\`
+export const GlobalStyle = createGlobalStyle`
   /* Reset ve temel stiller */
   *, *::before, *::after {
     box-sizing: border-box;
@@ -185,4 +185,4 @@ export const GlobalStyles = createGlobalStyle\`
       background-color: ${theme.colors.primary.black};
     }
   }
-\`;
+`;

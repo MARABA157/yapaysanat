@@ -1,24 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
-import { env } from '@/config/env';
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database.types'
 
-const supabaseUrl = env.SUPABASE_URL;
-const supabaseAnonKey = env.SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl) {
-  throw new Error('Missing SUPABASE_URL');
-}
+if (!supabaseUrl) throw new Error('Missing env.VITE_SUPABASE_URL')
+if (!supabaseAnonKey) throw new Error('Missing env.VITE_SUPABASE_ANON_KEY')
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing SUPABASE_ANON_KEY');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Supabase istemcisini oluştur
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
-  },
-});
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+})
 
-export type Tables = Database['public']['Tables'];
-export type Profile = Tables['profiles']['Row'];
-export type Image = Tables['images']['Row'];
+// Wrapper fonksiyonları
+export const getSupabase = () => supabase

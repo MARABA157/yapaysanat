@@ -73,9 +73,13 @@ export default function Gallery() {
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               <img
-                src={artwork.image_url}
+                src={artwork.image_url || 'https://source.unsplash.com/random/800x600/?artwork'}
                 alt={artwork.title}
                 className="w-full h-48 object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://source.unsplash.com/random/800x600/?artwork';
+                }}
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{artwork.title}</h3>
