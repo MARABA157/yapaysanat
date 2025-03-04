@@ -38,6 +38,7 @@ export interface Collection {
   cover_image?: string;
   user_id: string;
   artworks?: Artwork[];
+  is_private?: boolean;
   created_at?: string;
   updated_at?: string;
 }
