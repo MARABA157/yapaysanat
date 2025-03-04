@@ -1,15 +1,15 @@
-import { Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Loader2,
-  Music,
+  MessageSquare,
+  ImagePlus,
   Video,
-  Palette,
-  Image,
-  Mic,
-  Film,
-  Scroll
+  Music,
+  Headphones,
+  BookOpen,
+  Edit,
+  Film
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from "@/components/ui/badge";
@@ -20,261 +20,192 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CommunityStats } from '@/components/community/CommunityStats';
-
-// Lazy load components
-const LazyImage = lazy(() => import('@/components/ui/lazy-image'));
-
-// Loading component with skeleton
-const SectionLoader = () => (
-  <div className="w-full h-[50vh] flex items-center justify-center bg-black">
-    <div className="flex flex-col items-center gap-4">
-      <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
-      <p className="text-sm text-gray-400">Yükleniyor...</p>
-    </div>
-  </div>
-);
-
-const featuredArtists = [
-  {
-    name: "Dijital Sanat",
-    image: "https://images.pexels.com/photos/4100130/pexels-photo-4100130.jpeg",
-    specialty: "Dijital Sanat"
-  },
-  {
-    name: "Soyut Sanat",
-    image: "https://images.pexels.com/photos/1585325/pexels-photo-1585325.jpeg",
-    specialty: "Modern Soyut"
-  },
-  {
-    name: "Dijital Fantezi",
-    image: "https://images.pexels.com/photos/3109807/pexels-photo-3109807.jpeg",
-    specialty: "Fantastik Sanat"
-  },
-  {
-    name: "Dijital Portre",
-    image: "https://images.pexels.com/photos/2110951/pexels-photo-2110951.jpeg",
-    specialty: "Portre"
-  },
-  {
-    name: "Renk Patlaması",
-    image: "https://images.pexels.com/photos/3699259/pexels-photo-3699259.jpeg",
-    specialty: "Renk Kompozisyonu"
-  },
-  {
-    name: "Dijital Portre",
-    image: "https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg",
-    specialty: "Portre"
-  },
-  {
-    name: "Fraktal Sanat",
-    image: "https://images.pexels.com/photos/5022847/pexels-photo-5022847.jpeg",
-    specialty: "Matematiksel Sanat"
-  },
-  {
-    name: "Gelecek Vizyonu",
-    image: "https://images.pexels.com/photos/4577122/pexels-photo-4577122.jpeg",
-    specialty: "Fütüristik"
-  },
-  {
-    name: "Işık Oyunları",
-    image: "https://images.pexels.com/photos/4577179/pexels-photo-4577179.jpeg",
-    specialty: "Işık Sanatı"
-  },
-  {
-    name: "Uzay Sanatı",
-    image: "https://images.pexels.com/photos/4577547/pexels-photo-4577547.jpeg",
-    specialty: "Kozmik Sanat"
-  }
-];
 
 const artModules = [
   {
-    title: "Dijital Sanat",
-    description: "Modern dijital sanat teknikleriyle eserler yaratın! Hayal gücünüzü özgürce kullanın!",
-    icon: Palette,
-    gradient: "from-pink-500 via-purple-400 to-indigo-500",
-    bgImage: "https://images.pexels.com/photos/8386365/pexels-photo-8386365.jpeg",
-    link: "/gallery"
+    title: "AI Chat Asistanı",
+    description: "Yapay zeka destekli sanat asistanınız ile sohbet edin",
+    icon: MessageSquare,
+    gradient: "from-purple-600 to-blue-600",
+    bgImage: "https://images.pexels.com/photos/7130555/pexels-photo-7130555.jpeg",
+    link: "/chat"
   },
   {
-    title: "Resim Galerisi",
-    description: "Binlerce sanat eserini keşfedin! İlham alın ve kendi tarzınızı oluşturun!",
-    icon: Image,
-    gradient: "from-orange-500 via-red-400 to-pink-500",
-    bgImage: "https://images.pexels.com/photos/7034639/pexels-photo-7034639.jpeg",
-    link: "/gallery"
+    title: "Resim Oluşturma",
+    description: "Hayal ettiğin resimleri yapay zeka ile yarat! ",
+    icon: ImagePlus,
+    gradient: "from-pink-500 via-rose-400 to-orange-500",
+    bgImage: "https://images.pexels.com/photos/20072/pexels-photo.jpg",
+    link: "/create-image"
   },
   {
-    title: "Video Sanatı",
-    description: "Video sanatının büyülü dünyasına adım atın! Hareketli görüntülerle hikayeler anlatın!",
+    title: "Video Oluşturma",
+    description: "Metinden videoya, hayallerini canlandır! ",
     icon: Video,
-    gradient: "from-blue-500 via-cyan-400 to-teal-500",
-    bgImage: "https://images.pexels.com/photos/5473955/pexels-photo-5473955.jpeg",
-    link: "/video"
+    gradient: "from-purple-500 via-violet-400 to-indigo-500",
+    bgImage: "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg",
+    link: "/create-video"
   },
   {
-    title: "Sanat Yazıları",
-    description: "Sanat dünyasından en güncel yazılar! Sanat tarihinden modern sanata uzanan bir yolculuk!",
-    icon: Scroll,
-    gradient: "from-green-500 via-emerald-400 to-teal-500",
-    bgImage: "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg",
-    link: "/blog"
+    title: "Ses Asistanı",
+    description: "Yapay zeka ile sesli asistan deneyimi! ",
+    icon: Headphones,
+    gradient: "from-teal-500 via-emerald-400 to-green-500",
+    bgImage: "https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg",
+    link: "/audio-ai"
   },
   {
-    title: "Müzik ve Sanat",
-    description: "Müzik ve görsel sanatın muhteşem uyumu! Ses ve görüntünün dansına tanık olun!",
+    title: "Müzik Yapay Zekası",
+    description: "Kendi müziğini yapay zeka ile bestele! ",
     icon: Music,
-    gradient: "from-yellow-500 via-amber-400 to-orange-500",
-    bgImage: "https://images.pexels.com/photos/4498140/pexels-photo-4498140.jpeg",
-    link: "/music"
+    gradient: "from-red-500 via-orange-400 to-yellow-500",
+    bgImage: "https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg",
+    link: "/music-ai"
   },
   {
-    title: "Ses Sanatı",
-    description: "Ses ile sanatın buluşması! Deneysel ses çalışmalarını keşfedin!",
-    icon: Mic,
+    title: "Senaryo Asistanı",
+    description: "Hikayeler ve senaryolar yapay zeka ile yazılır! ",
+    icon: BookOpen,
     gradient: "from-cyan-500 via-blue-400 to-indigo-500",
-    bgImage: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=2072&auto=format&fit=crop",
-    link: "/audio"
+    bgImage: "https://images.pexels.com/photos/3059747/pexels-photo-3059747.jpeg",
+    link: "/script-ai"
   },
   {
-    title: "Fotoğraf Sanatı",
-    description: "Fotoğrafçılığın büyülü dünyası! Anı yakalayın, sanata dönüştürün!",
-    icon: Image,
+    title: "Resim Düzenleme",
+    description: "Fotoğraflarını profesyonelce düzenle! ",
+    icon: Edit,
     gradient: "from-fuchsia-500 via-purple-400 to-pink-500",
-    bgImage: "https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?q=80&w=2070&auto=format&fit=crop",
-    link: "/photography"
+    bgImage: "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
+    link: "/edit-image"
   },
   {
-    title: "Video Sanatı",
-    description: "Video sanatının sınırlarını zorlayın! Deneysel video sanatı projeleri!",
+    title: "Video Düzenleme",
+    description: "Videolarını yapay zeka ile düzenle! ",
     icon: Film,
     gradient: "from-violet-500 via-purple-400 to-fuchsia-500",
-    bgImage: "https://images.unsplash.com/photo-1536240478700-b869070f9279?q=80&w=2070&auto=format&fit=crop",
-    link: "/video-art"
+    bgImage: "https://images.pexels.com/photos/2544554/pexels-photo-2544554.jpeg",
+    link: "/edit-video"
   }
+];
+
+const exploreImages = [
+  // Doğa
+  "https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg",
+  "https://images.pexels.com/photos/2559941/pexels-photo-2559941.jpeg",
+  // Şehir
+  "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg",
+  "https://images.pexels.com/photos/1123972/pexels-photo-1123972.jpeg",
+  // Sinematik
+  "https://images.pexels.com/photos/2873669/pexels-photo-2873669.jpeg",
+  "https://images.pexels.com/photos/2887582/pexels-photo-2887582.jpeg",
+  // Film
+  "https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg",
+  "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg",
 ];
 
 export function Home() {
   return (
-    <div className="flex-1">
+    <div className="flex-1 w-screen">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 400px)' }}>
+      <section className="relative py-20 flex items-center justify-center overflow-hidden w-screen" style={{ height: '100vh' }}>
         <div className="absolute inset-0">
-          <Suspense fallback={<SectionLoader />}>
-            <LazyImage 
-              src="https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&q=80&w=1500" 
-              alt="Art Gallery" 
-              className="w-full h-full object-cover"
-            />
-          </Suspense>
+          <img 
+            src="https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&q=80&w=1500" 
+            alt="Art Gallery" 
+            className="w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-black/40" />
         </div>
-        <div className="container relative z-10 mx-auto px-4">
+        <div className="container mx-auto px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center"
+            className="text-center space-y-6"
           >
-            <h1 className="text-6xl font-bold mb-6">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500">
-                Sanat Dünyasına
+            <h1 className="text-4xl md:text-6xl font-bold text-white">
+              Sanatın Eğlenceli Dünyasına
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+                Hoş Geldiniz! 🎨
               </span>
-              <br />
-              Hoş Geldiniz
             </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Modern teknolojiler ve sanatın sınırlarını zorluyoruz. 
-              Geleceğin sanat dünyasını birlikte şekillendirmeye hazır mısınız?
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Picasso'nun fırçası kadar yetenekli olmana gerek yok! 
+              Yapay zeka ile sen de bir sanat dehası olabilirsin! 🚀
             </p>
-            <div className="flex flex-wrap gap-4 justify-center mt-8">
-              <Link to="/gallery">
-                <Button size="lg" className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Image className="w-5 h-5 mr-2" />
-                  Galeri
-                </Button>
+            <div className="flex flex-wrap gap-4 justify-center items-center">
+              <Link 
+                to="/chat"
+                className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300"
+              >
+                Hemen Başla! 🎯
               </Link>
-              <Link to="/explore">
-                <Button size="lg" className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Music className="w-5 h-5 mr-2" />
-                  Keşfet
-                </Button>
+              <Link 
+                to="/gallery"
+                className="px-8 py-3 rounded-full bg-white/10 backdrop-blur-sm text-white font-medium border border-white/20 hover:bg-white/20 hover:border-white/30 transform hover:scale-105 transition-all duration-300"
+              >
+                Galeriyi Keşfet 🎪
               </Link>
-              <Link to="/community">
-                <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Mic className="w-5 h-5 mr-2" />
-                  Topluluk
-                </Button>
-              </Link>
-              <Link to="/workshop">
-                <Button size="lg" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Mic className="w-5 h-5 mr-2" />
-                  Atölye
-                </Button>
-              </Link>
+              <motion.div
+                animate={{
+                  rotate: [0, -10, 10, -10, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="text-2xl"
+              >
+                👋
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Featured Artists Section */}
-      <section className="py-20 bg-black">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {featuredArtists.map((artist, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative group"
-              >
-                <Suspense fallback={<SectionLoader />}>
-                  <LazyImage
-                    src={artist.image}
-                    alt={artist.name}
-                    className="w-full h-64 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                  />
-                </Suspense>
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-2xl font-bold text-white">{artist.name}</h3>
-                  <p className="text-lg text-white/80">{artist.specialty}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Art Modules Grid */}
-      <section className="py-20 bg-black">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="py-20 relative w-screen">
+        <div 
+          className="absolute inset-0 bg-black/60"
+          style={{
+            backgroundImage: "url('https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="container mx-auto px-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {artModules.map((module, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  rotate: [0, -2, 2, -2, 0],
+                  transition: { duration: 0.3 }
+                }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Link to={module.link}>
-                  <Card className="relative h-[400px] overflow-hidden group">
-                    <Suspense fallback={<SectionLoader />}>
-                      <LazyImage
-                        src={module.bgImage}
-                        alt={module.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </Suspense>
-                    <div className="absolute inset-0 bg-black/40" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className={`inline-flex p-2.5 rounded-lg bg-gradient-to-br ${module.gradient} shadow-xl mb-3 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
-                        <module.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white">{module.title}</h3>
-                      <p className="text-lg text-white/80">{module.description}</p>
+                  <Card className="relative h-[280px] overflow-hidden group bg-white/10 backdrop-blur-sm border border-white/30 hover:border-white/50">
+                    <img
+                      src={module.bgImage}
+                      alt={module.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                      <motion.div 
+                        className={`inline-flex p-3 rounded-full bg-gradient-to-br ${module.gradient} shadow-xl mb-4 shadow-white/10`}
+                        whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <module.icon className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors drop-shadow-lg">{module.title}</h3>
+                      <p className="text-sm text-white group-hover:text-white transition-colors line-clamp-2 drop-shadow-lg">{module.description}</p>
                     </div>
                   </Card>
                 </Link>
@@ -284,12 +215,38 @@ export function Home() {
         </div>
       </section>
 
-      {/* Community Stats Section */}
-      <section className="py-20 bg-black">
-        <div className="container mx-auto px-4">
-          <CommunityStats />
-        </div>
+      {/* Explore Section */}
+      <section className="py-20 overflow-hidden bg-black/90 w-screen">
+        <motion.div 
+          className="flex gap-4 px-4"
+          animate={{
+            x: [0, -1920],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
+          {[...exploreImages, ...exploreImages].map((image, index) => (
+            <motion.div
+              key={index}
+              className="relative min-w-[250px] h-[300px] rounded-lg overflow-hidden"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <img
+                src={image}
+                alt={`Explore ${index + 1}`}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
+
+      {/* Footer */}
     </div>
   );
 }

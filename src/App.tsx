@@ -4,7 +4,6 @@ import { Helmet } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/AuthContext';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
@@ -31,10 +30,9 @@ export function App() {
           </Helmet>
 
           <div className="min-h-screen bg-black text-white flex">
-            <Sidebar />
-            <div className="flex-1 ml-64">
+            <div className="flex-1">
               <Header />
-              <main className="min-h-[calc(100vh-4rem)]">
+              <main className="min-h-[calc(100vh-2rem)]">
                 <AppRoutes />
               </main>
               <Footer />

@@ -21,7 +21,6 @@ const siteMap = {
     { title: "Ana Sayfa", path: "/" },
     { title: "Galeri", path: "/gallery" },
     { title: "Keşfet", path: "/explore" },
-    { title: "Topluluk", path: "/community" },
     { title: "Eğitimler", path: "/education/tutorials" }
   ],
   "Yapay Zeka": [
@@ -96,8 +95,8 @@ export function Header() {
   const getRandomScale = () => 0.95 + Math.random() * 0.1;
 
   return (
-    <header className={`sticky top-0 z-50 w-full toggle-scene ${isScrolled ? 'bg-background/20' : 'bg-transparent'} backdrop-blur-2xl transition-all duration-300`}>
-      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
+    <header className={`sticky top-0 z-50 w-full h-12 toggle-scene ${isScrolled ? 'bg-background/20' : 'bg-transparent'} backdrop-blur-2xl transition-all duration-300`}>
+      <div className="container flex h-full max-w-screen-2xl items-center justify-between">
         <div className="flex items-center">
           <RouterLink to="/" className="flex items-center space-x-2 mr-8">
             <motion.div
