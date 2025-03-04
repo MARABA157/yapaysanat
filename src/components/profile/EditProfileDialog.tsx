@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/useToast';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/hooks/useAuthContext';
+import type { User } from '@/types';
 
 const formSchema = z.object({
   username: z
@@ -17,10 +18,11 @@ const formSchema = z.object({
     .min(3, 'Kullanıcı adı en az 3 karakter olmalıdır')
     .max(20, 'Kullanıcı adı en fazla 20 karakter olabilir')
     .regex(/^[a-zA-Z0-9_]+$/, 'Sadece harf, rakam ve alt çizgi kullanabilirsiniz'),
-  full_name: z.string().min(2, 'İsim en az 2 karakter olmalıdır'),
-  bio: z.string().max(500, 'Biyografi en fazla 500 karakter olabilir').optional(),
-  website: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
+  email: z.string().email('Geçerli bir e-posta adresi giriniz'),
+  avatar_url: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -34,60 +36,56 @@ export function EditProfileDialog({
   onSuccess,
 }: EditProfileDialogProps) {
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: async () => {
-      if (!user) return {};
-
-      const { data } = await supabase
-        .from('profiles')
-        .select('username, full_name, bio, website')
-        .eq('id', user.id)
-        .single();
-
-      return {
-        username: data?.username || '',
-        full_name: data?.full_name || '',
-        bio: data?.bio || '',
-        website: data?.website || '',
-      };
+    defaultValues: {
+      username: user?.username || '',
+      email: user?.email || '',
+      avatar_url: user?.avatar_url || '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!user) return;
+  const onSubmit = async (values: FormValues) => {
+    if (!user) {
+      toast({
+        title: 'Hata',
+        description: 'Profil düzenlemek için giriş yapmalısınız.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      setLoading(true);
+      const updates: Partial<User> = {
+        username: values.username,
+        email: values.email,
+        avatar_url: values.avatar_url || '',
+        updated_at: new Date().toISOString(),
+      };
 
       const { error } = await supabase
-        .from('profiles')
-        .update({
-          username: values.username,
-          full_name: values.full_name,
-          bio: values.bio,
-          website: values.website,
-          updated_at: new Date().toISOString(),
-        })
+        .from('users')
+        .update(updates)
         .eq('id', user.id);
 
       if (error) throw error;
 
       toast({
         title: 'Başarılı',
-        description: 'Profil güncellendi',
+        description: 'Profiliniz başarıyla güncellendi.',
       });
 
       onOpenChange(false);
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast({
         title: 'Hata',
-        description: 'Profil güncellenirken bir hata oluştu',
+        description: 'Profil güncellenirken bir hata oluştu.',
         variant: 'destructive',
       });
     } finally {
@@ -101,8 +99,9 @@ export function EditProfileDialog({
         <DialogHeader>
           <DialogTitle>Profili Düzenle</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="username"
@@ -110,35 +109,37 @@ export function EditProfileDialog({
                 <FormItem>
                   <FormLabel>Kullanıcı Adı</FormLabel>
                   <FormControl>
-                    <Input placeholder="kullanici_adi" {...field} />
+                    <Input placeholder="Kullanıcı adı" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="full_name"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>İsim Soyisim</FormLabel>
+                  <FormLabel>E-posta</FormLabel>
                   <FormControl>
-                    <Input placeholder="Adınız Soyadınız" {...field} />
+                    <Input type="email" placeholder="E-posta adresi" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="bio"
+              name="avatar_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Biyografi</FormLabel>
+                  <FormLabel>Profil Fotoğrafı URL</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Kendinizden bahsedin..."
-                      className="resize-none"
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/avatar.jpg"
                       {...field}
                     />
                   </FormControl>
@@ -146,19 +147,7 @@ export function EditProfileDialog({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="website"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Website</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Güncelleniyor...' : 'Güncelle'}
             </Button>

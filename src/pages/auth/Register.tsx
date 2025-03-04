@@ -27,7 +27,7 @@ const artStyles = [
   "🎭 Sokak Sanatı"
 ];
 
-export default function Register() {
+export function Register() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);

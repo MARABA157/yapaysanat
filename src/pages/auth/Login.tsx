@@ -9,7 +9,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Eye, EyeOff, LogIn, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-export default function Login() {
+export function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);

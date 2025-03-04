@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { supabase } from '@/lib/supabase';
-import { Database } from '@/types/supabase';
-
-type Artwork = Database['public']['Tables']['artworks']['Row'] & {
-  user: Database['public']['Tables']['profiles']['Row'] | null;
-};
+import type { Artwork } from '@/types';
 
 type ArtworkFilters = {
   category?: string;
@@ -32,7 +28,7 @@ export function useArtworks(initialFilters: ArtworkFilters = {}) {
 
       let query = supabase
         .from('artworks')
-        .select('*, user:profiles(*)')
+        .select('*, artist:profiles(*)')
         .order('created_at', { ascending: false });
 
       if (filters.category) {
@@ -48,7 +44,7 @@ export function useArtworks(initialFilters: ArtworkFilters = {}) {
       }
 
       if (filters.userId) {
-        query = query.eq('user_id', filters.userId);
+        query = query.eq('artist_id', filters.userId);
       }
 
       const { data, error } = await query;
@@ -69,7 +65,7 @@ export function useArtworks(initialFilters: ArtworkFilters = {}) {
     }
   };
 
-  const createArtwork = async (artwork: Database['public']['Tables']['artworks']['Insert']) => {
+  const createArtwork = async (artwork: Partial<Artwork>) => {
     try {
       const { data, error } = await supabase.from('artworks').insert(artwork);
 
@@ -93,10 +89,7 @@ export function useArtworks(initialFilters: ArtworkFilters = {}) {
     }
   };
 
-  const updateArtwork = async (
-    id: string,
-    artwork: Database['public']['Tables']['artworks']['Update']
-  ) => {
+  const updateArtwork = async (id: string, artwork: Partial<Artwork>) => {
     try {
       const { error } = await supabase
         .from('artworks')

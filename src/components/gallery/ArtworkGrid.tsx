@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { supabase } from '@/lib/supabase';
-import { Database } from '@/types/supabase';
+import type { Artwork } from '@/types';
 import { ArtworkCard } from './ArtworkCard';
-import { ArtworkFilter } from '@/types/filters';
 
-type Artwork = Database['public']['Tables']['artworks']['Row'] & {
-  user: Database['public']['Tables']['profiles']['Row'] | null;
-};
+interface ArtworkFilter {
+  category?: string;
+  style?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  isForSale?: boolean;
+  sort?: string;
+}
 
 interface ArtworkGridProps {
   filters: ArtworkFilter;
@@ -29,7 +33,7 @@ export function ArtworkGrid({ filters, onFilterChange }: ArtworkGridProps) {
 
       let query = supabase
         .from('artworks')
-        .select('*, user:profiles(*)')
+        .select('*, artist:profiles(*)')
         .order('created_at', { ascending: false });
 
       if (filters.category) {

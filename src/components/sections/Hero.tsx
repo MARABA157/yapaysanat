@@ -1,69 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
-import { theme } from '../../styles/theme';
 import { motion } from 'framer-motion';
-
-const HeroContainer = styled.section`
-  height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: ${theme.colors.gradient.dark};
-`;
-
-const HeroContent = styled.div`
-  text-align: center;
-  color: ${theme.colors.primary.white};
-  z-index: 2;
-  padding: ${theme.spacing.xl};
-`;
-
-const HeroTitle = styled(motion.h1)`
-  font-size: 72px;
-  margin-bottom: ${theme.spacing.lg};
-  background: ${theme.colors.gradient.primary};
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  @media (max-width: ${theme.breakpoints.tablet}) {
-    font-size: 48px;
-  }
-`;
-
-const HeroSubtitle = styled(motion.p)`
-  font-size: ${theme.typography.accent.size};
-  margin-bottom: ${theme.spacing.xl};
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-`;
-
-const HeroButton = styled(motion.button)`
-  padding: ${theme.spacing.md} ${theme.spacing.xl};
-  background: ${theme.colors.primary.gold};
-  color: ${theme.colors.primary.white};
-  border-radius: ${theme.layout.radius.full};
-  font-weight: ${theme.typography.body.weights.bold};
-  font-size: ${theme.typography.body.sizes.regular};
-  
-  &:hover {
-    transform: ${theme.effects.hover.scale};
-    box-shadow: ${theme.shadows.lg};
-  }
-`;
-
-const BackgroundParticles = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  opacity: 0.5;
-`;
+import { Button } from '@/components/ui/button';
+import { Container } from '@/components/ui/container';
 
 const cities = [
   {
@@ -95,7 +33,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <HeroContainer>
+    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-background">
       {cities.map((city, index) => (
         <motion.div
           key={city.name}
@@ -123,48 +61,42 @@ export default function Hero() {
           </div>
         </motion.div>
       ))}
-      <BackgroundParticles
-        animate={{
-          background: [
-            'radial-gradient(circle, #FFD700 1px, transparent 1px)',
-            'radial-gradient(circle, #FFA500 1px, transparent 1px)',
-          ],
-          backgroundSize: ['50px 50px', '30px 30px'],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          repeatType: 'reverse',
-        }}
-      />
+      <Container>
+        <div className="text-center max-w-3xl mx-auto">
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Sanat ve Yapay Zeka
+          </motion.h1>
+          
+          <motion.p
+            className="text-lg md:text-xl text-muted-foreground mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Yapay zeka ile sanatın sınırlarını keşfedin. Yeni nesil sanat galerisi deneyimi için hoş geldiniz.
+          </motion.p>
 
-      <HeroContent>
-        <HeroTitle
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          Sanat ve Yapay Zeka
-        </HeroTitle>
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Button size="lg">
+              Keşfetmeye Başla
+            </Button>
+          </motion.div>
+        </div>
+      </Container>
 
-        <HeroSubtitle
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          Yapay zeka ile sanatın sınırlarını keşfedin. Yeni nesil sanat galerisi deneyimi için hoş geldiniz.
-        </HeroSubtitle>
-
-        <HeroButton
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          Keşfetmeye Başla
-        </HeroButton>
-      </HeroContent>
-    </HeroContainer>
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
+        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#c7d2fe,transparent)]" />
+      </div>
+    </section>
   );
-};
+}

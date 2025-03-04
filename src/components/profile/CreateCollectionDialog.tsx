@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { X } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuthContext } from '@/hooks/useAuthContext'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/useToast'
+import type { Collection } from '@/types'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import {
   Form,
   FormControl,
@@ -44,23 +44,8 @@ interface CreateCollectionDialogProps {
 
 export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: CreateCollectionDialogProps) {
   const [loading, setLoading] = useState(false)
-  const { user } = useAuth()
+  const { user } = useAuthContext()
   const { toast } = useToast()
-
-  const [preview, setPreview] = useState<string | null>(null);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setCoverImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -72,34 +57,41 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
   })
 
   const onSubmit = async (values: FormValues) => {
-    if (!user) return
+    if (!user) {
+      toast({
+        title: 'Hata',
+        description: 'Koleksiyon oluşturmak için giriş yapmalısınız.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setLoading(true)
 
     try {
-      setLoading(true)
-
-      const { error } = await supabase.from('collections').insert({
+      const collection: Partial<Collection> = {
         name: values.name,
-        description: values.description,
+        description: values.description || '',
         is_private: values.isPrivate,
         user_id: user.id,
-        cover_image: coverImage,
-      })
+      }
+
+      const { error } = await supabase.from('collections').insert(collection)
 
       if (error) throw error
 
       toast({
         title: 'Başarılı',
-        description: 'Koleksiyon başarıyla oluşturuldu',
+        description: 'Koleksiyon başarıyla oluşturuldu.',
       })
 
       form.reset()
-      onSuccess?.()
       onOpenChange(false)
+      onSuccess?.()
     } catch (error) {
-      console.error('Error creating collection:', error)
       toast({
         title: 'Hata',
-        description: 'Koleksiyon oluşturulurken bir hata oluştu',
+        description: 'Koleksiyon oluşturulurken bir hata oluştu.',
         variant: 'destructive',
       })
     } finally {
@@ -109,11 +101,11 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Yeni Koleksiyon Oluştur</DialogTitle>
+          <DialogTitle>Yeni Koleksiyon</DialogTitle>
           <DialogDescription>
-            Sanat eserlerinizi düzenlemek için yeni bir koleksiyon oluşturun.
+            Eserlerinizi düzenlemek için yeni bir koleksiyon oluşturun.
           </DialogDescription>
         </DialogHeader>
 
@@ -126,7 +118,7 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
                 <FormItem>
                   <FormLabel>Koleksiyon Adı</FormLabel>
                   <FormControl>
-                    <Input placeholder="Koleksiyonunuza bir isim verin" {...field} />
+                    <Input placeholder="Koleksiyon adı" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,7 +137,6 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>En fazla 500 karakter</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -157,9 +148,9 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel>Gizli Koleksiyon</FormLabel>
+                    <FormLabel className="text-base">Gizli Koleksiyon</FormLabel>
                     <FormDescription>
-                      Koleksiyonu sadece siz görebilirsiniz
+                      Bu koleksiyonu sadece siz görebilirsiniz
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -172,54 +163,19 @@ export function CreateCollectionDialog({ open, onOpenChange, onSuccess }: Create
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="coverImage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kapak Görseli</FormLabel>
-                  <FormControl>
-                    <Input 
-                      id="cover" 
-                      type="file" 
-                      accept="image/*"
-                      onChange={(e) => {
-                        handleImageChange(e);
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  {preview && (
-                    <div className="mt-2">
-                      <img 
-                        src={preview} 
-                        alt="Önizleme" 
-                        className="w-full h-40 object-cover rounded-lg"
-                      />
-                    </div>
-                  )}
-                </FormItem>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <LoadingSpinner size="sm" />
+                  <span>Oluşturuluyor...</span>
+                </div>
+              ) : (
+                'Koleksiyon Oluştur'
               )}
-            />
-
-            <div className="flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={loading}
-              >
-                İptal
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Oluşturuluyor...' : 'Oluştur'}
-              </Button>
-            </div>
+            </Button>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
   )
 }
-
-export default CreateCollectionDialog

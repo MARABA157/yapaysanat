@@ -3,6 +3,9 @@ import { toast } from 'react-hot-toast';
 interface ToastOptions {
   duration?: number;
   position?: 'top-right' | 'top-center' | 'top-left' | 'bottom-right' | 'bottom-center' | 'bottom-left';
+  variant?: 'default' | 'destructive';
+  title?: string;
+  description?: string;
 }
 
 export const useToast = () => {
@@ -22,6 +25,11 @@ export const useToast = () => {
   return {
     showToast,
     dismiss: toast.dismiss,
+    toast: (options: ToastOptions) => {
+      const { title, description, variant = 'default', ...rest } = options;
+      const message = title ? `${title}\n${description || ''}` : description;
+      return showToast(message || '', variant === 'destructive' ? 'error' : 'custom', rest);
+    },
   };
 };
 

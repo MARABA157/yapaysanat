@@ -25,7 +25,7 @@
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": false,
     "allowJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": false,
@@ -43,6 +43,7 @@
     }
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

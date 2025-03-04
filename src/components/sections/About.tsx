@@ -1,138 +1,25 @@
 import React from 'react';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { theme } from '../../styles/theme';
+import { Container } from '@/components/ui/container';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
-const AboutContainer = styled.section`
-  min-height: 100vh;
-  background: ${theme.colors.primary.white};
-  padding: ${theme.spacing.xxl} 0;
-`;
-
-const AboutContent = styled.div`
-  max-width: ${theme.layout.maxWidth};
-  margin: 0 auto;
-  padding: 0 ${theme.spacing.xl};
-`;
-
-const AboutHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing.xxl};
-`;
-
-const AboutTitle = styled(motion.h2)`
-  color: ${theme.colors.accent.darkGray};
-  font-size: ${theme.typography.heading.sizes.h2};
-  margin-bottom: ${theme.spacing.lg};
-`;
-
-const AboutDescription = styled(motion.p)`
-  color: ${theme.colors.accent.darkGray};
-  max-width: 800px;
-  margin: 0 auto;
-  opacity: 0.8;
-  line-height: 1.6;
-`;
-
-const FeaturesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${theme.spacing.xl};
-  margin-top: ${theme.spacing.xxl};
-
-  @media (max-width: ${theme.breakpoints.tablet}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FeatureCard = styled(motion.div)`
-  background: ${theme.colors.primary.white};
-  border-radius: ${theme.layout.radius.lg};
-  padding: ${theme.spacing.xl};
-  box-shadow: ${theme.shadows.md};
-  transition: all ${theme.transitions.medium};
-
-  &:hover {
-    transform: ${theme.effects.hover.scale};
-    box-shadow: ${theme.shadows.lg};
-  }
-`;
-
-const FeatureIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  background: ${theme.colors.gradient.primary};
-  border-radius: ${theme.layout.radius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: ${theme.spacing.lg};
-  color: ${theme.colors.primary.white};
-  font-size: 24px;
-`;
-
-const FeatureTitle = styled.h3`
-  color: ${theme.colors.accent.darkGray};
-  font-size: ${theme.typography.body.sizes.large};
-  font-weight: ${theme.typography.body.weights.bold};
-  margin-bottom: ${theme.spacing.md};
-`;
-
-const FeatureDescription = styled.p`
-  color: ${theme.colors.accent.darkGray};
-  opacity: 0.8;
-  line-height: 1.6;
-`;
-
-const TeamSection = styled.div`
-  margin-top: ${theme.spacing.xxl};
-  text-align: center;
-`;
-
-const TeamGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: ${theme.spacing.xl};
-  margin-top: ${theme.spacing.xl};
-
-  @media (max-width: ${theme.breakpoints.tablet}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const TeamMemberCard = styled(motion.div)`
-  text-align: center;
-`;
-
-const TeamMemberImage = styled.div`
-  width: 120px;
-  height: 120px;
-  border-radius: ${theme.layout.radius.full};
-  background: ${theme.colors.gradient.primary};
-  margin: 0 auto ${theme.spacing.lg};
-  overflow: hidden;
-`;
-
-const TeamMemberName = styled.h4`
-  color: ${theme.colors.accent.darkGray};
-  font-size: ${theme.typography.body.sizes.regular};
-  font-weight: ${theme.typography.body.weights.bold};
-  margin-bottom: ${theme.spacing.xs};
-`;
-
-const TeamMemberRole = styled.p`
-  color: ${theme.colors.accent.darkGray};
-  opacity: 0.8;
-  font-size: ${theme.typography.body.sizes.small};
-`;
+const AboutContainer = 'py-16 bg-background';
+const AboutContent = 'text-center mb-12';
+const AboutHeader = '';
+const AboutTitle = 'text-3xl font-bold mb-4';
+const AboutDescription = 'text-muted-foreground max-w-2xl mx-auto';
+const FeaturesGrid = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+const FeatureCard = 'p-6';
+const FeatureIcon = 'w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4';
+const FeatureTitle = 'text-lg font-semibold mb-2';
+const FeatureDescription = 'text-muted-foreground';
+const TeamSection = 'text-center mt-12';
+const TeamGrid = '';
+const TeamMemberCard = '';
+const TeamMemberImage = '';
+const TeamMemberName = '';
+const TeamMemberRole = '';
 
 const features = [
   {
@@ -190,78 +77,84 @@ const teamMembers = [
   },
 ];
 
-export const About: React.FC = () => {
+export default function About() {
   return (
-    <AboutContainer>
-      <AboutContent>
-        <AboutHeader>
-          <AboutTitle
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+    <section className={AboutContainer}>
+      <Container>
+        <div className={AboutContent}>
+          <motion.h2 
+            className={AboutTitle}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             Hakkımızda
-          </AboutTitle>
-          <AboutDescription
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+          </motion.h2>
+          <motion.p
+            className={AboutDescription}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             Sanat Galerisi, yapay zeka ve sanatı bir araya getirerek yeni nesil bir sanat deneyimi sunuyor. 
             Amacımız, sanatçıları ve sanatseverleri modern teknolojilerle buluşturarak yaratıcılığın 
             sınırlarını genişletmek.
-          </AboutDescription>
-        </AboutHeader>
+          </motion.p>
+        </div>
 
-        <FeaturesGrid>
+        <div className={FeaturesGrid}>
           {features.map((feature, index) => (
-            <FeatureCard
+            <motion.div
               key={feature.title}
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <FeatureIcon>{feature.icon}</FeatureIcon>
-              <FeatureTitle>{feature.title}</FeatureTitle>
-              <FeatureDescription>{feature.description}</FeatureDescription>
-            </FeatureCard>
+              <Card className={FeatureCard}>
+                <div className={FeatureIcon}>{feature.icon}</div>
+                <h3 className={FeatureTitle}>{feature.title}</h3>
+                <p className={FeatureDescription}>{feature.description}</p>
+              </Card>
+            </motion.div>
           ))}
-        </FeaturesGrid>
+        </div>
 
-        <TeamSection>
-          <AboutTitle
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+        <div className={TeamSection}>
+          <motion.h2 
+            className={AboutTitle}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             Ekibimiz
-          </AboutTitle>
-          <AboutDescription
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+          </motion.h2>
+          <motion.p
+            className={AboutDescription}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             Tutkulu ve deneyimli ekibimizle size en iyi deneyimi sunmak için çalışıyoruz.
-          </AboutDescription>
+          </motion.p>
 
-          <TeamGrid>
+          <div className={TeamGrid}>
             {teamMembers.map((member, index) => (
-              <TeamMemberCard
+              <motion.div
                 key={member.name}
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <TeamMemberImage>
+                <div className={TeamMemberImage}>
                   <img src={member.image} alt={member.name} />
-                </TeamMemberImage>
-                <TeamMemberName>{member.name}</TeamMemberName>
-                <TeamMemberRole>{member.role}</TeamMemberRole>
-              </TeamMemberCard>
+                </div>
+                <h4 className={TeamMemberName}>{member.name}</h4>
+                <p className={TeamMemberRole}>{member.role}</p>
+              </motion.div>
             ))}
-          </TeamGrid>
-        </TeamSection>
-      </AboutContent>
-    </AboutContainer>
+          </div>
+        </div>
+      </Container>
+    </section>
   );
-};
+}

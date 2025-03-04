@@ -1,18 +1,14 @@
 import { createContext, useContext } from 'react';
-import type { Profile } from '@/types/supabase';
-
-interface AuthUser extends Profile {
-  email: string;
-}
+import type { User } from '@/types';
 
 interface AuthContextValue {
-  user: AuthUser | null;
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, username: string, fullName: string) => Promise<void>;
+  signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
-  updateProfile: (profile: Partial<Profile>) => Promise<void>;
+  updateProfile: (profile: Partial<User>) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue>({

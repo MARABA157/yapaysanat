@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { supabase } from '@/lib/supabase';
-import { Database } from '@/types/supabase';
+import type { Collection } from '@/types';
 import { CollectionCard } from '@/components/collections/CollectionCard';
-
-type Collection = Database['public']['Tables']['collections']['Row'] & {
-  user: Database['public']['Tables']['profiles']['Row'] | null;
-  artworks: Database['public']['Tables']['artworks']['Row'][];
-};
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export function FeaturedCollections() {
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -20,15 +16,21 @@ export function FeaturedCollections() {
 
   const fetchFeaturedCollections = async () => {
     try {
-      setLoading(true);
-
       const { data, error } = await supabase
         .from('collections')
-        .select('*, user:profiles(*), artworks(*)')
+        .select(`
+          *,
+          owner:profiles(*),
+          artworks:collection_artworks(
+            artwork:artworks(*)
+          )
+        `)
         .eq('is_featured', true)
         .limit(6);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       setCollections(data || []);
     } catch (error) {
@@ -46,11 +48,13 @@ export function FeaturedCollections() {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Array.from({ length: 6 }).map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-[300px] rounded-lg bg-gray-100 animate-pulse dark:bg-gray-800"
-          />
+            className="flex items-center justify-center h-[300px] rounded-lg bg-muted"
+          >
+            <LoadingSpinner size="lg" />
+          </div>
         ))}
       </div>
     );
@@ -59,7 +63,7 @@ export function FeaturedCollections() {
   if (collections.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-lg text-gray-500 dark:text-gray-400">
+        <p className="text-lg text-muted-foreground">
           Henüz öne çıkan koleksiyon bulunmuyor.
         </p>
       </div>

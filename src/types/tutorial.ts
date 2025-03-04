@@ -1,30 +1,35 @@
-import { Database } from './supabase';
-
-export enum TutorialLevel {
-  BEGINNER = 'Başlangıç',
-  INTERMEDIATE = 'Orta Seviye',
-  ADVANCED = 'İleri Seviye'
-}
+import type { ProfileBase } from './supabase';
 
 export interface Tutorial {
   id: string;
+  created_at: string;
+  updated_at: string | null;
   title: string;
-  content: string;
-  level: TutorialLevel;
-  author: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  duration: number; // dakika cinsinden
-  createdAt: Date;
-  likes: number;
-  views: number;
+  description: string;
+  video_url: string;
+  image_url: string | null;
+  category: 'beginner' | 'intermediate' | 'advanced';
+  user_id: string;
+  views_count: number;
+  likes_count: number;
+  author?: ProfileBase;
 }
 
-export type TutorialType = Database['public']['Tables']['tutorials']['Row'] & {
-  user: Database['public']['Tables']['profiles']['Row'] | null;
+export type TutorialWithAuthor = Tutorial & {
+  author: ProfileBase;
 };
 
-export type TutorialInsert = Database['public']['Tables']['tutorials']['Insert'];
-export type TutorialUpdate = Database['public']['Tables']['tutorials']['Update'];
+export type TutorialCategory = Tutorial['category'];
+
+export type TutorialStats = {
+  views_count: number;
+  likes_count: number;
+  completion_rate?: number;
+};
+
+export type TutorialFilters = {
+  category?: TutorialCategory;
+  level?: string;
+  duration?: string;
+  tags?: string[];
+};

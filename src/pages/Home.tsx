@@ -53,9 +53,9 @@ const SectionLoader = () => (
 
 const featuredArtists = [
   {
-    name: "AI Dijital Sanat",
+    name: "Dijital Sanat",
     image: "https://images.pexels.com/photos/4100130/pexels-photo-4100130.jpeg",
-    specialty: "Yapay Zeka Sanatı"
+    specialty: "Dijital Sanat"
   },
   {
     name: "Soyut Sanat",
@@ -68,9 +68,9 @@ const featuredArtists = [
     specialty: "Fantastik Sanat"
   },
   {
-    name: "Nöral Sanat",
+    name: "Dijital Portre",
     image: "https://images.pexels.com/photos/2110951/pexels-photo-2110951.jpeg",
-    specialty: "AI Üretimi"
+    specialty: "Portre"
   },
   {
     name: "Renk Patlaması",
@@ -80,7 +80,7 @@ const featuredArtists = [
   {
     name: "Dijital Portre",
     image: "https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg",
-    specialty: "AI Portre"
+    specialty: "Portre"
   },
   {
     name: "Fraktal Sanat",
@@ -106,72 +106,72 @@ const featuredArtists = [
 
 const artModules = [
   {
-    title: "AI Sohbet Asistanı",
-    description: "Picasso'nun fırçası, Van Gogh'un kulağı burada! 🎨 Sanat tarihinin en renkli karakterleriyle sohbet edin, hem öğrenin hem eğlenin! 🗣️✨",
-    icon: MessageSquare,
+    title: "Dijital Sanat",
+    description: "Modern dijital sanat teknikleriyle eserler yaratın! 🎨 Hayal gücünüzü özgürce kullanın! 🌈",
+    icon: Palette,
     gradient: "from-pink-500 via-purple-400 to-indigo-500",
     bgImage: "https://images.pexels.com/photos/8386365/pexels-photo-8386365.jpeg",
-    link: "/ai/Chat"
+    link: "/gallery"
   },
   {
-    title: "AI Resim Oluşturma",
-    description: "Salvador Dali'nin rüyalarını kıskandıracak eserler yaratın! 🎨 Gerçeküstü fikirlerinizi tek tıkla sanat eserine dönüştürün! 🌈",
-    icon: Palette,
+    title: "Resim Galerisi",
+    description: "Binlerce sanat eserini keşfedin! 🎨 İlham alın ve kendi tarzınızı oluşturun! 🌈",
+    icon: Image,
     gradient: "from-orange-500 via-red-400 to-pink-500",
     bgImage: "https://images.pexels.com/photos/7034639/pexels-photo-7034639.jpeg",
-    link: "/ai/image-generate"
+    link: "/gallery"
   },
   {
-    title: "AI Video Yapımcısı",
-    description: "Spielberg, hazır ol! 🎬 Kedinin süper kahraman, köpeğin baş rol oyuncusu olduğu filmler çekin! 🦸‍♂️🐱",
+    title: "Video Sanatı",
+    description: "Video sanatının büyülü dünyasına adım atın! 🎬 Hareketli görüntülerle hikayeler anlatın! 🎮",
     icon: Video,
     gradient: "from-blue-500 via-cyan-400 to-teal-500",
     bgImage: "https://images.pexels.com/photos/5473955/pexels-photo-5473955.jpeg",
-    link: "/ai/Video"
+    link: "/video"
   },
   {
-    title: "AI Senaryo Ustası",
-    description: "Shakespeare'e rakip geldi! 📝 'Bir varmış, bir AI'mış...' Modern masallar, çılgın hikayeler yazalım! 🎭",
+    title: "Sanat Yazıları",
+    description: "Sanat dünyasından en güncel yazılar! 📝 Sanat tarihinden modern sanata uzanan bir yolculuk! 🎭",
     icon: Scroll,
     gradient: "from-green-500 via-emerald-400 to-teal-500",
     bgImage: "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg",
-    link: "/ai/script"
+    link: "/blog"
   },
   {
-    title: "AI Müzik Bestecisi",
-    description: "Mozart kulaklarını çınlatsın! 🎵 Kedinin miyavlamasını senfoniye, köpeğin havlamasını rap şarkısına çevirelim! 🐱🎹",
+    title: "Müzik ve Sanat",
+    description: "Müzik ve görsel sanatın muhteşem uyumu! 🎵 Ses ve görüntünün dansına tanık olun! 🎹",
     icon: Music,
     gradient: "from-yellow-500 via-amber-400 to-orange-500",
     bgImage: "https://images.pexels.com/photos/4498140/pexels-photo-4498140.jpeg",
-    link: "/ai-music"
+    link: "/music"
   },
   {
-    title: "AI Ses Sihirbazı",
-    description: "Morgan Freeman sesi mi? Uzaylı dili mi? 🎤 Sesinize istediğiniz karakteri yükleyin, eğlenceyi ikiye katlayın! 🗣️👽",
+    title: "Ses Sanatı",
+    description: "Ses ile sanatın buluşması! 🎤 Deneysel ses çalışmalarını keşfedin! 🎧",
     icon: Mic,
     gradient: "from-cyan-500 via-blue-400 to-indigo-500",
     bgImage: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=2072&auto=format&fit=crop",
-    link: "/ai/Audio"
+    link: "/audio"
   },
   {
-    title: "AI Resim Düzenleyici",
-    description: "Fotoğraflarınıza sihirli dokunuş! 🌟 Eski fotoğrafları canlandırır, yenileri bambaşka dünyalara taşırız! ✨",
+    title: "Fotoğraf Sanatı",
+    description: "Fotoğrafçılığın büyülü dünyası! 📸 Anı yakalayın, sanata dönüştürün! ✨",
     icon: Image,
     gradient: "from-fuchsia-500 via-purple-400 to-pink-500",
     bgImage: "https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?q=80&w=2070&auto=format&fit=crop",
-    link: "/ai/image-edit"
+    link: "/photography"
   },
   {
-    title: "AI Video Düzenleyici",
-    description: "Hollywood efektleri cebinizde! 🎬 Sıradan videoları başyapıta dönüştürün! Efektler, geçişler, müzikler... Hepsi bir tık uzağınızda! 🎮✨",
+    title: "Video Sanatı",
+    description: "Video sanatının sınırlarını zorlayın! 🎬 Deneysel video sanatı projeleri! 🎮✨",
     icon: Film,
     gradient: "from-violet-500 via-purple-400 to-fuchsia-500",
     bgImage: "https://images.unsplash.com/photo-1536240478700-b869070f9279?q=80&w=2070&auto=format&fit=crop",
-    link: "/ai/video-edit"
+    link: "/video-art"
   }
 ];
 
-export default function Home() {
+export function Home() {
   return (
     <>
       <div className="flex-1">
@@ -200,7 +200,7 @@ export default function Home() {
                 Hoş Geldiniz
               </h1>
               <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                Modern teknolojiler ve yapay zeka ile sanatın sınırlarını zorluyoruz. 
+                Modern teknolojiler ve sanatın sınırlarını zorluyoruz. 
                 Geleceğin sanat dünyasını birlikte şekillendirmeye hazır mısınız?
               </p>
               <div className="flex flex-wrap gap-4 justify-center mt-8">
@@ -222,10 +222,10 @@ export default function Home() {
                     Topluluk
                   </Button>
                 </Link>
-                <Link to="/ai-workshop">
+                <Link to="/workshop">
                   <Button size="lg" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300">
                     <Wand2 className="w-5 h-5 mr-2" />
-                    AI Atölyesi
+                    Atölye
                   </Button>
                 </Link>
               </div>
@@ -233,7 +233,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AI Services Section */}
+        {/* Sanat Hizmetleri Section */}
         <section className="relative py-24 overflow-hidden">
           {/* Deniz-Sahil Arka Planı */}
           <div 

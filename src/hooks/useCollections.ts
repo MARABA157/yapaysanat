@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { supabase } from '@/lib/supabase';
-import { Database } from '@/types/supabase';
-
-type Collection = Database['public']['Tables']['collections']['Row'] & {
-  user: Database['public']['Tables']['profiles']['Row'] | null;
-  artworks: Database['public']['Tables']['artworks']['Row'][];
-};
+import type { Collection } from '@/types';
 
 type CollectionFilters = {
   userId?: string;
-  isPublic?: boolean;
+  status?: 'public' | 'private';
 };
 
 export function useCollections(initialFilters: CollectionFilters = {}) {
@@ -31,15 +26,15 @@ export function useCollections(initialFilters: CollectionFilters = {}) {
 
       let query = supabase
         .from('collections')
-        .select('*, user:profiles(*), artworks(*)')
+        .select('*, artworks(*)')
         .order('created_at', { ascending: false });
 
       if (filters.userId) {
         query = query.eq('user_id', filters.userId);
       }
 
-      if (filters.isPublic !== undefined) {
-        query = query.eq('is_public', filters.isPublic);
+      if (filters.status) {
+        query = query.eq('status', filters.status);
       }
 
       const { data, error } = await query;
@@ -60,7 +55,7 @@ export function useCollections(initialFilters: CollectionFilters = {}) {
     }
   };
 
-  const createCollection = async (collection: Database['public']['Tables']['collections']['Insert']) => {
+  const createCollection = async (collection: Partial<Collection>) => {
     try {
       const { data, error } = await supabase.from('collections').insert(collection);
 
@@ -84,10 +79,7 @@ export function useCollections(initialFilters: CollectionFilters = {}) {
     }
   };
 
-  const updateCollection = async (
-    id: string,
-    collection: Database['public']['Tables']['collections']['Update']
-  ) => {
+  const updateCollection = async (id: string, collection: Partial<Collection>) => {
     try {
       const { error } = await supabase
         .from('collections')

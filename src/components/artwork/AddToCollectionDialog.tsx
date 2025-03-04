@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/hooks/useAuthContext';
 import { supabase } from '@/lib/supabase';
-import type { Artwork, Collection } from '@/types/supabase';
+import type { Artwork, Collection } from '@/types';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface AddToCollectionDialogProps {
@@ -26,7 +26,7 @@ export function AddToCollectionDialog({
   trigger,
   onSuccess,
 }: AddToCollectionDialogProps) {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [collections, setCollections] = useState<Collection[]>([]);

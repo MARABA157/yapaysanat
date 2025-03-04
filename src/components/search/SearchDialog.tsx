@@ -22,13 +22,13 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
     if (!query.trim()) {
       toast({
         title: 'Hata',
-        description: 'Lütfen bir arama terimi girin',
+        description: 'Lütfen bir arama terimi girin.',
         variant: 'destructive',
       });
       return;
     }
 
-    navigate(`/search?q=${encodeURIComponent(query)}`);
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
     onOpenChange(false);
   };
 
@@ -38,14 +38,13 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
         <DialogHeader>
           <DialogTitle>Ara</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSearch} className="grid gap-4 py-4">
-          <div className="flex items-center gap-4">
+        <form onSubmit={handleSearch} className="space-y-4">
+          <div className="flex gap-2">
             <Input
-              id="search"
-              placeholder="Sanat eseri, sanatçı veya koleksiyon ara..."
+              placeholder="Eser, koleksiyon veya sanatçı ara..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="col-span-3"
+              className="flex-1"
             />
             <Button type="submit">
               <Search className="h-4 w-4" />

@@ -1,3 +1,42 @@
+import type { Database as DatabaseGenerated } from './supabase-types';
+
+export type Database = DatabaseGenerated;
+
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];
+
+// Base types from database
+export type ArtworkBase = Tables<'artworks'>;
+export type CollectionBase = Tables<'collections'>;
+export type ProfileBase = Tables<'profiles'>;
+export type CommentBase = Tables<'comments'>;
+export type LikeBase = Tables<'likes'>;
+export type FollowBase = Tables<'follows'>;
+export type TagBase = Tables<'tags'>;
+export type CollectionArtworkBase = Tables<'collection_artworks'>;
+
+// Extended types with additional fields
+export interface Artwork extends ArtworkBase {
+  artist?: ProfileBase;
+  comments?: CommentBase[];
+  likes?: LikeBase[];
+}
+
+export interface Collection extends CollectionBase {
+  owner?: ProfileBase;
+  artworks?: Artwork[];
+  stats?: {
+    artwork_count: number;
+    view_count: number;
+    like_count: number;
+  };
+}
+
+export interface Comment extends CommentBase {
+  user?: ProfileBase;
+  replies?: Comment[];
+}
+
 export type Json =
   | string
   | number
@@ -6,232 +45,32 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export interface Database {
-  public: {
-    Tables: {
-      artworks: {
-        Row: {
-          id: string;
-          created_at: string;
-          title: string;
-          description: string | null;
-          image_url: string;
-          user_id: string;
-          style: string | null;
-          status: 'pending' | 'approved' | 'rejected';
-          views_count: number;
-          likes_count: number;
-          comments_count: number;
-          category: string | null;
-          tags: string[] | null;
-        };
-        Insert: {
-          id?: string;
-          created_at?: string;
-          title: string;
-          description?: string | null;
-          image_url: string;
-          user_id: string;
-          style?: string | null;
-          status?: 'pending' | 'approved' | 'rejected';
-          views_count?: number;
-          likes_count?: number;
-          comments_count?: number;
-          category?: string | null;
-          tags?: string[] | null;
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          title?: string;
-          description?: string | null;
-          image_url?: string;
-          user_id?: string;
-          style?: string | null;
-          status?: 'pending' | 'approved' | 'rejected';
-          views_count?: number;
-          likes_count?: number;
-          comments_count?: number;
-          category?: string | null;
-          tags?: string[] | null;
-        };
-      };
-      tutorials: {
-        Row: {
-          id: string;
-          created_at: string;
-          updated_at: string | null;
-          title: string;
-          description: string;
-          video_url: string;
-          image_url: string | null;
-          category: 'beginner' | 'intermediate' | 'advanced';
-          user_id: string;
-          views_count: number;
-          likes_count: number;
-        };
-        Insert: {
-          id?: string;
-          created_at?: string;
-          updated_at?: string | null;
-          title: string;
-          description: string;
-          video_url: string;
-          image_url?: string | null;
-          category: 'beginner' | 'intermediate' | 'advanced';
-          user_id: string;
-          views_count?: number;
-          likes_count?: number;
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          updated_at?: string | null;
-          title?: string;
-          description?: string;
-          video_url?: string;
-          image_url?: string | null;
-          category?: 'beginner' | 'intermediate' | 'advanced';
-          user_id?: string;
-          views_count?: number;
-          likes_count?: number;
-        };
-      };
-      profiles: {
-        Row: {
-          id: string;
-          created_at: string;
-          full_name: string;
-          avatar_url: string | null;
-          website: string | null;
-          bio: string | null;
-          role: 'user' | 'admin';
-          email: string;
-          preferences: Json | null;
-        };
-        Insert: {
-          id: string;
-          created_at?: string;
-          full_name: string;
-          avatar_url?: string | null;
-          website?: string | null;
-          bio?: string | null;
-          role?: 'user' | 'admin';
-          email: string;
-          preferences?: Json | null;
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          full_name?: string;
-          avatar_url?: string | null;
-          website?: string | null;
-          bio?: string | null;
-          role?: 'user' | 'admin';
-          email?: string;
-          preferences?: Json | null;
-        };
-      };
-      comments: {
-        Row: {
-          id: string;
-          created_at: string;
-          content: string;
-          user_id: string;
-          artwork_id: string;
-          parent_id: string | null;
-          likes_count: number;
-        };
-        Insert: {
-          id?: string;
-          created_at?: string;
-          content: string;
-          user_id: string;
-          artwork_id: string;
-          parent_id?: string | null;
-          likes_count?: number;
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          content?: string;
-          user_id?: string;
-          artwork_id?: string;
-          parent_id?: string | null;
-          likes_count?: number;
-        };
-      };
-      collections: {
-        Row: {
-          id: string;
-          created_at: string;
-          title: string;
-          description: string | null;
-          user_id: string;
-          is_public: boolean;
-          artworks: string[];
-        };
-        Insert: {
-          id?: string;
-          created_at?: string;
-          title: string;
-          description?: string | null;
-          user_id: string;
-          is_public?: boolean;
-          artworks?: string[];
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          title?: string;
-          description?: string | null;
-          user_id?: string;
-          is_public?: boolean;
-          artworks?: string[];
-        };
-      };
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      [_ in never]: never;
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-  };
-}
+// Database operation types
+export type ArtworkInsert = Database['public']['Tables']['artworks']['Insert'];
+export type ArtworkUpdate = Database['public']['Tables']['artworks']['Update'];
+export type ArtworkStats = {
+  views_count: number;
+  likes_count: number;
+  comments_count: number;
+};
 
-export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type CollectionInsert = Database['public']['Tables']['collections']['Insert'];
+export type CollectionUpdate = Database['public']['Tables']['collections']['Update'];
 
-export interface Collection {
-  id: string;
-  name: string;
-  cover_image: string;
-  featured: boolean;
-  artwork_count: number;
-  user?: Profile;
-  artworks?: Artwork[];
-}
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
-export interface Artwork {
-  id: string;
-  title: string;
-  description?: string;
-  image_url: string;
-  user_id: string;
-  artist: string;
-  likes: number;
-  comments: number;
-  views: number;
-  user?: Profile;
-  stats?: {
-    like_count: number;
-    comment_count: number;
-    view_count: number;
-  }
-}
+export type CommentInsert = Database['public']['Tables']['comments']['Insert'];
+export type CommentUpdate = Database['public']['Tables']['comments']['Update'];
 
-export type CollectionArtwork = Database['public']['Tables']['collection_artworks']['Row'];
-export type ArtworkStats = Database['public']['Tables']['artwork_stats']['Row'];
+export type LikeInsert = Database['public']['Tables']['likes']['Insert'];
+export type LikeUpdate = Database['public']['Tables']['likes']['Update'];
+
+export type FollowInsert = Database['public']['Tables']['follows']['Insert'];
+export type FollowUpdate = Database['public']['Tables']['follows']['Update'];
+
+export type TagInsert = Database['public']['Tables']['tags']['Insert'];
+export type TagUpdate = Database['public']['Tables']['tags']['Update'];
+
+export type CollectionArtworkInsert = Database['public']['Tables']['collection_artworks']['Insert'];
+export type CollectionArtworkUpdate = Database['public']['Tables']['collection_artworks']['Update'];

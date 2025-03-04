@@ -1,16 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
-import App from './App';
-import Home from '@/pages/Home';
-import Explore from '@/pages/Explore';
-import Profile from '@/pages/Profile';
-import Collections from '@/pages/Collections';
-import CollectionDetail from '@/pages/CollectionDetail';
-import Settings from '@/pages/Settings';
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
-import ArtworkDetail from '@/pages/artwork/ArtworkDetail';
-import NotFound from '@/pages/NotFound';
-import ImageEdit from '@/pages/ai/image-edit';
+import { App } from './App';
+import { Home } from '@/pages/Home';
+import { Explore } from '@/pages/explore/Explore';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { Settings } from '@/pages/Settings';
+import { Login } from '@/pages/auth/Login';
+import { Register } from '@/pages/auth/Register';
+import { ArtworkDetail } from '@/pages/artwork/ArtworkDetail';
+import { NotFound } from '@/pages/NotFound';
 
 const router = createBrowserRouter([
   {
@@ -23,41 +20,29 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: 'explore',
+        path: '/explore',
         element: <Explore />,
       },
       {
-        path: 'profile/:username',
-        element: <Profile />,
+        path: '/profile/:id',
+        element: <ProfilePage />,
       },
       {
-        path: 'collections',
-        element: <Collections />,
-      },
-      {
-        path: 'collections/:id',
-        element: <CollectionDetail />,
-      },
-      {
-        path: 'settings',
+        path: '/settings',
         element: <Settings />,
       },
       {
-        path: 'artwork/:id',
-        element: <ArtworkDetail />,
-      },
-      {
-        path: 'auth/login',
+        path: '/login',
         element: <Login />,
       },
       {
-        path: 'auth/register',
+        path: '/register',
         element: <Register />,
       },
       {
-        path: 'ai/image-edit',
-        element: <ImageEdit />,
-      }
+        path: '/artwork/:id',
+        element: <ArtworkDetail />,
+      },
     ],
   },
 ]);

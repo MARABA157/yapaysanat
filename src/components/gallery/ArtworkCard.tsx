@@ -1,14 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import type { Artwork } from '@/types';
 
 interface ArtworkCardProps {
-  artwork: {
-    id: string;
-    title: string;
-    artist: string;
-    image_url: string;
-  };
+  artwork: Artwork;
 }
 
 export function ArtworkCard({ artwork }: ArtworkCardProps) {
@@ -27,7 +23,9 @@ export function ArtworkCard({ artwork }: ArtworkCardProps) {
       </CardHeader>
       <CardContent className="p-4">
         <h3 className="font-semibold">{artwork.title}</h3>
-        <p className="text-sm text-muted-foreground">{artwork.artist}</p>
+        {artwork.artist && (
+          <p className="text-sm text-muted-foreground">{artwork.artist.username}</p>
+        )}
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Button

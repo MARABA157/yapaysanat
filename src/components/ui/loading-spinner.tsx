@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg"
 }
 
 export function LoadingSpinner({ 
@@ -10,21 +10,27 @@ export function LoadingSpinner({
   ...props 
 }: LoadingSpinnerProps) {
   const sizeClasses = {
-    sm: "w-4 h-4",
-    md: "w-6 h-6",
-    lg: "w-8 h-8"
-  };
+    sm: "h-4 w-4",
+    md: "h-8 w-8",
+    lg: "h-12 w-12"
+  }
 
   return (
-    <div
+    <div 
+      role="status"
       className={cn(
-        "inline-block animate-spin rounded-full border-2 border-current border-t-transparent",
-        sizeClasses[size],
+        "flex justify-center items-center",
         className
       )}
       {...props}
     >
+      <div 
+        className={cn(
+          "animate-spin rounded-full border-2 border-primary/30 border-b-primary",
+          sizeClasses[size]
+        )}
+      />
       <span className="sr-only">Yükleniyor...</span>
     </div>
-  );
+  )
 }
