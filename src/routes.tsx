@@ -8,8 +8,8 @@ import { Login } from '@/pages/auth/Login';
 import { Register } from '@/pages/auth/Register';
 import { ArtworkDetail } from '@/pages/artwork/ArtworkDetail';
 import { NotFound } from '@/pages/NotFound';
-import { Gallery } from '@/pages/Gallery';
-import { Profile } from '@/pages/Profile';
+import Gallery from '@/pages/Gallery';
+import Profile from '@/pages/Profile';
 
 const router = createBrowserRouter([
   {
@@ -63,7 +63,6 @@ export function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 }
