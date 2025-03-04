@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Palette, Search, User, Sparkles, Crown, GraduationCap, Users, LogIn, UserPlus, Brush, Paintbrush, Pencil, Eraser, Scissors, Wand2, Sun, Moon, Lightbulb, Map } from 'lucide-react';
@@ -33,7 +34,6 @@ const siteMap = {
     { title: "Video Düzenleme", path: "/ai/video-edit" },
     { title: "Ses İşleme", path: "/ai/audio" },
     { title: "Senaryo Yazma", path: "/ai/script" },
-    { title: "Sanat İyileştirme", path: "/ai/enhancement" },
     { title: "Sanat Üretimi", path: "/ai/generate" }
   ],
   "Kullanıcı": [
@@ -99,7 +99,7 @@ export function Header() {
     <header className={`sticky top-0 z-50 w-full toggle-scene ${isScrolled ? 'bg-background/20' : 'bg-transparent'} backdrop-blur-2xl transition-all duration-300`}>
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center space-x-2 mr-8">
+          <RouterLink to="/" className="flex items-center space-x-2 mr-8">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
@@ -113,7 +113,7 @@ export function Header() {
             >
               Sanat Galerisi
             </motion.span>
-          </Link>
+          </RouterLink>
 
           {/* Site Haritası Dropdown */}
           <DropdownMenu>
@@ -158,7 +158,7 @@ export function Header() {
           </button>
 
           {/* Premium Button */}
-          <Link href="/premium">
+          <RouterLink to="/premium">
             <motion.div
               className="relative"
               onMouseEnter={() => setIsHoveringPremium(true)}
@@ -191,10 +191,10 @@ export function Header() {
                 </motion.div>
               </Button>
             </motion.div>
-          </Link>
+          </RouterLink>
 
           {/* Login Button */}
-          <Link href="/auth/login">
+          <RouterLink to="/auth/login">
             <motion.div
               className="relative"
               onMouseEnter={() => setIsHoveringLogin(true)}
@@ -227,10 +227,10 @@ export function Header() {
                 </motion.div>
               </Button>
             </motion.div>
-          </Link>
+          </RouterLink>
 
           {/* Signup Button */}
-          <Link href="/auth/register">
+          <RouterLink to="/auth/register">
             <motion.div
               className="relative"
               onMouseEnter={() => setIsHoveringSignup(true)}
@@ -266,7 +266,7 @@ export function Header() {
                 </motion.div>
               </Button>
             </motion.div>
-          </Link>
+          </RouterLink>
 
           {/* Mobile Menu Toggle */}
           <Button
@@ -296,7 +296,7 @@ export function Header() {
             >
               <div className="px-4 pt-4 pb-6 space-y-4 bg-black/30 backdrop-blur-2xl rounded-b-xl shadow-lg">
                 <div className="pt-4 space-y-3">
-                  <Link href="/premium">
+                  <RouterLink to="/premium">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -305,8 +305,8 @@ export function Header() {
                       <Crown className="mr-2 h-4 w-4" />
                       <span>Premium</span>
                     </Button>
-                  </Link>
-                  <Link href="/auth/login">
+                  </RouterLink>
+                  <RouterLink to="/auth/login">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -315,8 +315,8 @@ export function Header() {
                       <LogIn className="mr-2 h-4 w-4" />
                       <span>Giriş Yap</span>
                     </Button>
-                  </Link>
-                  <Link href="/auth/register">
+                  </RouterLink>
+                  <RouterLink to="/auth/register">
                     <Button
                       variant="default"
                       size="sm"
@@ -325,7 +325,7 @@ export function Header() {
                       <UserPlus className="mr-2 h-4 w-4" />
                       <span>Kayıt Oluştur</span>
                     </Button>
-                  </Link>
+                  </RouterLink>
                 </div>
               </div>
             </motion.div>

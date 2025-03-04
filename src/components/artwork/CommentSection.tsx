@@ -1,136 +1,110 @@
-import { useState, useEffect } from 'react';
-import { formatDistance } from 'date-fns';
+import { useState } from 'react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { CommentWithUser } from '@/types/models';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
-import { Avatar } from '@/components/ui/avatar';
-import type { Comment, Profile } from '@/types/supabase';
-
-interface CommentWithUser extends Comment {
-  user: Profile;
-}
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/useToast';
 
 interface CommentSectionProps {
   artworkId: string;
+  comments?: CommentWithUser[];
+  onAddComment?: (content: string) => Promise<void>;
 }
 
-export function CommentSection({ artworkId }: CommentSectionProps) {
-  const [comments, setComments] = useState<CommentWithUser[]>([]);
+export function CommentSection({ artworkId, comments: propComments, onAddComment }: CommentSectionProps) {
+  const [comments, setComments] = useState<CommentWithUser[]>(propComments || []);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loadingComments, setLoadingComments] = useState(false); // Yeni loading durumu
   const { user } = useAuth();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchComments();
-  }, [artworkId]);
-
-  const fetchComments = async () => {
-    setLoadingComments(true);
-    try {
-      const { data, error } = await supabase
-        .from('comments')
-        .select('*, user:profiles(*)')
-        .eq('artwork_id', artworkId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setComments(data as CommentWithUser[]);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      toast({
-        title: 'Hata',
-        description: 'Yorumlar yüklenirken bir hata oluştu',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoadingComments(false);
-    }
-  };
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newComment.trim()) return;
+    
     if (!user) {
-      toast({
-        title: 'Hata',
-        description: 'Yorum yapmak için giriş yapmalısınız',
-        variant: 'destructive',
-      });
+      showToast('Yorum yapmak için giriş yapmalısınız', 'error');
       return;
     }
-
-    if (!newComment.trim()) return;
-
+    
     setLoading(true);
     try {
-      const { error } = await supabase.from('comments').insert({
-        content: newComment.trim(),
-        artwork_id: artworkId,
-        user_id: user.id,
-      });
-
-      if (error) throw error;
-
+      if (onAddComment) {
+        await onAddComment(newComment);
+      } else {
+        // Mock yorum ekleme - gerçek uygulamada API çağrısı yapılacak
+        const mockComment: CommentWithUser = {
+          id: `comment-${Date.now()}`,
+          content: newComment,
+          user_id: user.id,
+          artwork_id: artworkId,
+          created_at: new Date().toISOString(),
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            full_name: user.full_name,
+            avatar_url: user.avatar_url,
+            role: user.role,
+            preferences: user.preferences,
+            created_at: user.created_at
+          }
+        };
+        
+        setComments(prev => [mockComment, ...prev]);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simüle edilmiş gecikme
+      }
+      
       setNewComment('');
-      await fetchComments();  // Yorum ekledikten sonra yorumları tekrar yükle
-      toast({
-        title: 'Başarılı',
-        description: 'Yorumunuz eklendi',
-      });
+      showToast('Yorumunuz eklendi', 'success');
     } catch (error) {
-      console.error('Error adding comment:', error);
-      toast({
-        title: 'Hata',
-        description: 'Yorum eklenirken bir hata oluştu',
-        variant: 'destructive',
-      });
+      console.error('Yorum eklenirken hata oluştu:', error);
+      showToast('Yorum eklenirken bir hata oluştu', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Yorumlar</h2>
-
-      {user && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Yorumunuzu yazın..."
-            className="min-h-[100px]"
-          />
-          <Button type="submit" disabled={loading || !newComment.trim()}>
-            {loading ? 'Gönderiliyor...' : 'Yorum Yap'}
+    <div className="space-y-6" id="comments">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Yorumunuzu yazın..."
+          className="min-h-[100px] resize-none"
+          disabled={loading || !user}
+        />
+        <div className="flex justify-end">
+          <Button 
+            type="submit" 
+            disabled={loading || !user || !newComment.trim()}
+          >
+            {loading ? 'Gönderiliyor...' : 'Yorum Ekle'}
           </Button>
-        </form>
-      )}
+        </div>
+      </form>
 
-      <div className="space-y-4">
-        {loadingComments ? (
-          <div>Yorumlar yükleniyor...</div>
+      <div className="space-y-6">
+        {comments.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>Henüz yorum yapılmamış. İlk yorumu siz yapın!</p>
+          </div>
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} className="flex gap-4">
-              <Avatar
-                src={comment.user.avatar_url || undefined}
-                alt={comment.user.username}
-                fallback={comment.user.username.slice(0, 2).toUpperCase()}
-              />
+            <div key={comment.id} className="flex gap-4 border-b border-border pb-4">
+              <Avatar>
+                <AvatarImage src={comment.user.avatar_url} alt={comment.user.full_name} />
+                <AvatarFallback>{comment.user.full_name.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">{comment.user.username}</span>
+                  <span className="font-medium">{comment.user.full_name}</span>
                   <span className="text-sm text-muted-foreground">
-                    {formatDistance(new Date(comment.created_at), new Date(), {
-                      addSuffix: true,
-                      locale: tr,
-                    })}
+                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: tr })}
                   </span>
                 </div>
                 <p className="mt-1">{comment.content}</p>

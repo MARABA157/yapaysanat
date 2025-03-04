@@ -1,81 +1,64 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import { ErrorFallback } from './ErrorFallback';
+import React, { Component, ErrorInfo } from 'react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<FallbackProps>;
 }
 
-interface State {
+export interface FallbackProps {
+  error: Error;
+  resetErrorBoundary: () => void;
+}
+
+interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
-  errorInfo: ErrorInfo | null;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null,
-    errorInfo: null,
-  };
+const DefaultFallback: React.FC<FallbackProps> = ({ error, resetErrorBoundary }) => (
+  <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center">
+    <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
+    <h2 className="text-2xl font-bold mb-2">Bir şeyler yanlış gitti</h2>
+    <p className="text-gray-600 mb-4">
+      Üzgünüz, bir hata oluştu. Lütfen daha sonra tekrar deneyin.
+    </p>
+    <div className="text-left bg-gray-100 p-4 rounded-md mb-4 max-w-full overflow-auto">
+      <pre className="text-sm text-red-600 whitespace-pre-wrap break-words">
+        {error.message}
+      </pre>
+    </div>
+    <Button onClick={resetErrorBoundary}>Tekrar Dene</Button>
+  </div>
+);
 
-  public static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-      errorInfo: null,
-    };
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({ errorInfo });
-    
-    // Hata bilgilerini konsola yazdır
-    console.error('Uncaught error:', error);
-    console.error('Component stack:', errorInfo.componentStack);
-
-    // Özel hata işleme fonksiyonunu çağır
-    this.props.onError?.(error, errorInfo);
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
   }
 
-  private handleRetry = () => {
-    this.setState({ hasError: false, error: null, errorInfo: null });
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+  }
+
+  resetErrorBoundary = (): void => {
+    this.setState({ hasError: false, error: null });
   };
 
-  public render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
+  render(): React.ReactNode {
+    const { hasError, error } = this.state;
+    const { children, fallback: Fallback = DefaultFallback } = this.props;
 
-      return (
-        <ErrorFallback
-          error={this.state.error}
-          errorInfo={this.state.errorInfo}
-          onRetry={this.handleRetry}
-        />
-      );
+    if (hasError && error) {
+      return <Fallback error={error} resetErrorBoundary={this.resetErrorBoundary} />;
     }
 
-    return this.props.children;
+    return children;
   }
 }
-
-// Higher-order component for easier usage
-export function withErrorBoundary<P extends object>(
-  WrappedComponent: React.ComponentType<P>,
-  fallback?: ReactNode,
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
-) {
-  return function WithErrorBoundaryWrapper(props: P) {
-    return (
-      <ErrorBoundary fallback={fallback} onError={onError}>
-        <WrappedComponent {...props} />
-      </ErrorBoundary>
-    );
-  };
-}
-
-export default ErrorBoundary;

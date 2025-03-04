@@ -1,34 +1,65 @@
-import { Routes, Route } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
+import App from './App';
 import Home from '@/pages/Home';
-import Gallery from '@/pages/gallery';
-import AiArt from '@/pages/AiArt';
-import AiChat from '@/pages/AiChat';
-import AiVideo from '@/pages/AiVideo';
-import Competitions from '@/pages/Competitions';
-import Premium from '@/pages/Premium';
-import { Header } from '@/components/layout/Header';
-import ArtEnhancement from '@/pages/ai/ArtEnhancement';
-import AdvancedSearch from '@/components/search/AdvancedSearch';
-import GeneratePage from '@/pages/ai/GeneratePage';
-import About from '@/pages/about';
+import Explore from '@/pages/Explore';
+import Profile from '@/pages/Profile';
+import Collections from '@/pages/Collections';
+import CollectionDetail from '@/pages/CollectionDetail';
+import Settings from '@/pages/Settings';
+import Login from '@/pages/auth/Login';
+import Register from '@/pages/auth/Register';
+import ArtworkDetail from '@/pages/artwork/ArtworkDetail';
+import NotFound from '@/pages/NotFound';
+import ImageEdit from '@/pages/ai/image-edit';
 
-export function AppRoutes() {
-  return (
-    <>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/gallery/*" element={<Gallery />} />
-        <Route path="/ai-art" element={<AiArt />} />
-        <Route path="/ai-chat" element={<AiChat />} />
-        <Route path="/ai-video" element={<AiVideo />} />
-        <Route path="/ai/generate" element={<GeneratePage />} />
-        <Route path="/competitions" element={<Competitions />} />
-        <Route path="/premium" element={<Premium />} />
-        <Route path="/ai/enhancement" element={<ArtEnhancement />} />
-        <Route path="/search" element={<AdvancedSearch />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
-    </>
-  );
-}
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <App />,
+    errorElement: <NotFound />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'explore',
+        element: <Explore />,
+      },
+      {
+        path: 'profile/:username',
+        element: <Profile />,
+      },
+      {
+        path: 'collections',
+        element: <Collections />,
+      },
+      {
+        path: 'collections/:id',
+        element: <CollectionDetail />,
+      },
+      {
+        path: 'settings',
+        element: <Settings />,
+      },
+      {
+        path: 'artwork/:id',
+        element: <ArtworkDetail />,
+      },
+      {
+        path: 'auth/login',
+        element: <Login />,
+      },
+      {
+        path: 'auth/register',
+        element: <Register />,
+      },
+      {
+        path: 'ai/image-edit',
+        element: <ImageEdit />,
+      }
+    ],
+  },
+]);
+
+export default router;

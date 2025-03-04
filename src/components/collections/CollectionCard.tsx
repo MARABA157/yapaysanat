@@ -1,8 +1,7 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { MoreHorizontal } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { Collection } from '@/types/supabase';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Edit2, Trash2, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,107 +9,103 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { EditCollectionDialog } from './EditCollectionDialog';
 import { useToast } from '@/hooks/useToast';
-import { supabase } from '@/lib/supabase';
+import type { Collection } from '@/types/models';
 
 interface CollectionCardProps {
   collection: Collection;
-  onDelete?: (id: string) => void;
-  onUpdate?: (collection: Collection) => void;
-  showActions?: boolean;
-  className?: string;
+  currentUserId?: string;
+  onEdit?: (collection: Collection) => void;
+  onDelete?: (collectionId: string) => void;
 }
 
 export function CollectionCard({
   collection,
+  currentUserId,
+  onEdit,
   onDelete,
-  onUpdate,
-  showActions = true,
-  className = '',
 }: CollectionCardProps) {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const [isHovered, setIsHovered] = useState(false);
 
-  const isOwner = useMemo(() => user?.id === collection.user_id, [user, collection.user_id]);
+  const isOwner = currentUserId === collection.user_id;
 
-  const handleDelete = async () => {
-    if (!window.confirm('Koleksiyonu silmek istediğinize emin misiniz?')) return;
+  const handleClick = () => {
+    navigate(`/collections/${collection.id}`);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit(collection);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onDelete) return;
 
     try {
-      const { error } = await supabase.from('collections').delete().eq('id', collection.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Başarılı',
-        description: 'Koleksiyon başarıyla silindi',
-      });
-
-      onDelete?.(collection.id);
+      await onDelete(collection.id);
+      showToast('Koleksiyon başarıyla silindi', 'success');
     } catch (error) {
-      console.error('Koleksiyon silinirken hata oluştu:', error);
-      toast({
-        title: 'Hata',
-        description: 'Koleksiyon silinirken bir hata oluştu',
-        variant: 'destructive',
-      });
+      showToast('Koleksiyon silinirken bir hata oluştu', 'error');
     }
   };
 
   return (
-    <div className={`group relative overflow-hidden rounded-lg ${className}`}>
-      <Link to={`/collections/${collection.id}`}>
-        <div className="aspect-square overflow-hidden">
-          <img
-            src={collection.cover_image || '/placeholder-collection.jpg'}
-            alt={`${collection.name} koleksiyonu`}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-        </div>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      className="relative group cursor-pointer bg-card rounded-lg overflow-hidden shadow-lg"
+      onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative aspect-[4/3]">
+        <img
+          src={collection.cover_image}
+          alt={collection.name}
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-0 p-4 text-white">
-          <h3 className="text-lg font-semibold line-clamp-1">{collection.name}</h3>
-          {collection.description && (
-            <p className="mt-1 text-sm text-gray-200 line-clamp-2">{collection.description}</p>
-          )}
-          <div className="mt-2 flex items-center gap-2 text-sm">
-            <span>{collection.artwork_count || 0} eser</span>
-            {collection.featured && (
-              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs">Öne Çıkan</span>
-            )}
-          </div>
-        </div>
-      </Link>
+      </div>
 
-      {showActions && isOwner && (
-        <div className="absolute right-2 top-2">
+      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+        <h3 className="text-xl font-bold mb-2">{collection.name}</h3>
+        {collection.description && (
+          <p className="text-sm text-gray-200 line-clamp-2">{collection.description}</p>
+        )}
+      </div>
+
+      {isOwner && (
+        <div className="absolute top-2 right-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8 bg-black/20 hover:bg-black/40"
+                className="h-8 w-8 p-0"
                 onClick={(e) => e.stopPropagation()}
               >
-                <MoreHorizontal className="h-4 w-4 text-white" />
+                <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>Düzenle</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600" onClick={handleDelete}>Sil</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEdit}>
+                <Edit2 className="mr-2 h-4 w-4" />
+                Düzenle
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={handleDelete}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Sil
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <EditCollectionDialog
-            collection={collection}
-            open={isEditDialogOpen}
-            onOpenChange={setIsEditDialogOpen}
-            onUpdate={onUpdate}
-          />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

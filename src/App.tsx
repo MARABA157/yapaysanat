@@ -7,6 +7,8 @@ import { Footer } from '@/components/layout/Footer';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from '@/theme';
+import { AuthProvider } from '@/context/AuthContext';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 // Pages
 import Home from '@/pages/Home';
@@ -39,65 +41,69 @@ function App() {
   }, [location.pathname]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Helmet>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        <title>Sanat Galerisi - Dijital Sanat Platformu</title>
-        <meta name="description" content="Yapay zeka destekli dijital sanat platformu" />
-        
-        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
-        <meta name="referrer" content="strict-origin-when-cross-origin" />
-        
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        
-        <meta name="theme-color" content="#000000" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      </Helmet>
-
-      <div className="flex flex-col min-h-screen bg-background">
-        <Header />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/register" element={<Register />} />
-            <Route path="/artist/:id" element={<ArtistProfile />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Helmet>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+            <title>Sanat Galerisi - Dijital Sanat Platformu</title>
+            <meta name="description" content="Yapay zeka destekli dijital sanat platformu" />
             
-            {/* AI Routes */}
-            <Route path="/ai/chat" element={<Chat />} />
-            <Route path="/ai/audio" element={<Audio />} />
-            <Route path="/ai/video" element={<Video />} />
-            <Route path="/ai/script" element={<Script />} />
-            <Route path="/ai/image-generate" element={<ImageGenerate />} />
-            <Route path="/ai/image-edit" element={<ImageEdit />} />
-            <Route path="/ai/video-edit" element={<VideoEdit />} />
-            <Route path="/ai-music" element={<AIMusic />} />
+            <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+            <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+            <meta name="referrer" content="strict-origin-when-cross-origin" />
+            
+            <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            
+            <meta name="theme-color" content="#000000" />
+            <meta name="mobile-web-app-capable" content="yes" />
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          </Helmet>
 
-            {/* Education Routes */}
-            <Route path="/education" element={<Tutorials />} />
+          <div className="flex flex-col min-h-screen bg-background">
+            <Header />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/gallery" element={<Gallery />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/auth/login" element={<Login />} />
+                <Route path="/auth/register" element={<Register />} />
+                <Route path="/artist/:id" element={<ArtistProfile />} />
+                
+                {/* AI Routes */}
+                <Route path="/ai/chat" element={<Chat />} />
+                <Route path="/ai/audio" element={<Audio />} />
+                <Route path="/ai/video" element={<Video />} />
+                <Route path="/ai/script" element={<Script />} />
+                <Route path="/ai/image-generate" element={<ImageGenerate />} />
+                <Route path="/ai/image-edit" element={<ImageEdit />} />
+                <Route path="/ai/video-edit" element={<VideoEdit />} />
+                <Route path="/ai-music" element={<AIMusic />} />
 
-            {/* Community Routes */}
-            <Route path="/community" element={<Community />} />
+                {/* Education Routes */}
+                <Route path="/education" element={<Tutorials />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/*" element={<AdminLayout />} />
-          </Routes>
-        </main>
-        <Footer />
-        <Toaster />
-      </div>
-    </ThemeProvider>
+                {/* Community Routes */}
+                <Route path="/community" element={<Community />} />
+
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/*" element={<AdminLayout />} />
+              </Routes>
+            </main>
+            <Footer />
+            <Toaster />
+          </div>
+        </ThemeProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
