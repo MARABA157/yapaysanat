@@ -1,11 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
-import { HelmetProvider } from 'react-helmet-async'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { ThemeProvider } from '@/components/theme-provider'
-import router from '@/routes'
-import '@/index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/components/theme-provider';
+import { RouterProvider } from 'react-router-dom';
+import router from '@/routes';
+import '@/index.css';
 
 const root = document.getElementById('root') as HTMLElement
 
@@ -18,7 +19,9 @@ ReactDOM.createRoot(root).render(
     <HelmetProvider>
       <AuthProvider>
         <ThemeProvider defaultTheme="light" storageKey="sanat-galerisi-theme">
-          <RouterProvider router={router} />
+          <BrowserRouter>
+            <RouterProvider router={router} />
+          </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>
     </HelmetProvider>
