@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
-import { useLocation, Outlet } from 'react-router-dom';
+import { useLocation, BrowserRouter as Router } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from 'react-hot-toast';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/AuthContext';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { AppRoutes } from '@/routes';
 
 export function App() {
   const location = useLocation();
@@ -38,14 +40,19 @@ export function App() {
             <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           </Helmet>
 
-          <div className="flex flex-col min-h-screen bg-background">
-            <Header />
-            <main className="flex-grow">
-              <Outlet />
-            </main>
-            <Footer />
+          <Router>
+            <div className="min-h-screen bg-background text-white flex">
+              <Sidebar />
+              <div className="flex-1 ml-64">
+                <Header />
+                <main className="min-h-[calc(100vh-4rem)]">
+                  <AppRoutes />
+                </main>
+                <Footer />
+              </div>
+            </div>
             <Toaster />
-          </div>
+          </Router>
         </ThemeProvider>
       </AuthProvider>
     </ErrorBoundary>
