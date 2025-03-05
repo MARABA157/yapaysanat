@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  Loader2,
   MessageSquare,
   ImagePlus,
   Video,
@@ -11,15 +9,8 @@ import {
   Edit,
   Film
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Link } from 'react-router-dom';
+import { Card } from "@/components/ui/card";
 
 const artModules = [
   {
@@ -36,7 +27,7 @@ const artModules = [
     icon: ImagePlus,
     gradient: "from-pink-500 via-rose-400 to-orange-500",
     bgImage: "https://images.pexels.com/photos/20072/pexels-photo.jpg",
-    link: "/create-image"
+    link: "/generate/image"
   },
   {
     title: "Video Oluşturma",
@@ -44,7 +35,7 @@ const artModules = [
     icon: Video,
     gradient: "from-purple-500 via-violet-400 to-indigo-500",
     bgImage: "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg",
-    link: "/create-video"
+    link: "/generate/video"
   },
   {
     title: "Ses Asistanı",
@@ -52,7 +43,7 @@ const artModules = [
     icon: Headphones,
     gradient: "from-teal-500 via-emerald-400 to-green-500",
     bgImage: "https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg",
-    link: "/audio-ai"
+    link: "/generate/audio"
   },
   {
     title: "Müzik Yapay Zekası",
@@ -60,7 +51,7 @@ const artModules = [
     icon: Music,
     gradient: "from-red-500 via-orange-400 to-yellow-500",
     bgImage: "https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg",
-    link: "/music-ai"
+    link: "/ai-music"
   },
   {
     title: "Senaryo Asistanı",
@@ -68,7 +59,7 @@ const artModules = [
     icon: BookOpen,
     gradient: "from-cyan-500 via-blue-400 to-indigo-500",
     bgImage: "https://images.pexels.com/photos/3059747/pexels-photo-3059747.jpeg",
-    link: "/script-ai"
+    link: "/generate/script"
   },
   {
     title: "Resim Düzenleme",
@@ -76,7 +67,7 @@ const artModules = [
     icon: Edit,
     gradient: "from-fuchsia-500 via-purple-400 to-pink-500",
     bgImage: "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
-    link: "/edit-image"
+    link: "/edit/image"
   },
   {
     title: "Video Düzenleme",
@@ -84,23 +75,19 @@ const artModules = [
     icon: Film,
     gradient: "from-violet-500 via-purple-400 to-fuchsia-500",
     bgImage: "https://images.pexels.com/photos/2544554/pexels-photo-2544554.jpeg",
-    link: "/edit-video"
+    link: "/edit/video"
   }
 ];
 
 const exploreImages = [
-  // Doğa
   "https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg",
   "https://images.pexels.com/photos/2559941/pexels-photo-2559941.jpeg",
-  // Şehir
   "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg",
   "https://images.pexels.com/photos/1123972/pexels-photo-1123972.jpeg",
-  // Sinematik
   "https://images.pexels.com/photos/2873669/pexels-photo-2873669.jpeg",
   "https://images.pexels.com/photos/2887582/pexels-photo-2887582.jpeg",
-  // Film
   "https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg",
-  "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg",
+  "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg"
 ];
 
 export function Home() {
@@ -120,8 +107,12 @@ export function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center space-y-6"
+            transition={{ 
+              duration: 1.5,
+              delay: 0.5,
+              ease: "easeOut"
+            }}
+            className="text-center space-y-6 relative z-10"
           >
             <h1 className="text-4xl md:text-6xl font-bold text-white">
               Sanatın Eğlenceli Dünyasına
@@ -140,12 +131,17 @@ export function Home() {
               >
                 Hemen Başla! 🎯
               </Link>
-              <Link 
-                to="/gallery"
-                className="px-8 py-3 rounded-full bg-white/10 backdrop-blur-sm text-white font-medium border border-white/20 hover:bg-white/20 hover:border-white/30 transform hover:scale-105 transition-all duration-300"
+              <button 
+                onClick={() => {
+                  document.getElementById('art-modules')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }}
+                className="px-8 py-3 rounded-full bg-black text-white font-medium border border-white/20 hover:bg-black/80 hover:border-white/30 transform hover:scale-105 transition-all duration-300"
               >
-                Galeriyi Keşfet 🎪
-              </Link>
+                Yapay Zekaları Keşfet 🤖
+              </button>
               <motion.div
                 animate={{
                   rotate: [0, -10, 10, -10, 0],
@@ -165,7 +161,7 @@ export function Home() {
       </section>
 
       {/* Art Modules Grid */}
-      <section className="py-20 relative w-screen">
+      <section id="art-modules" className="py-20 relative w-screen">
         <div 
           className="absolute inset-0 bg-black/60"
           style={{
@@ -216,34 +212,33 @@ export function Home() {
       </section>
 
       {/* Explore Section */}
-      <section className="py-20 overflow-hidden bg-black/90 w-screen">
-        <motion.div 
-          className="flex gap-4 px-4"
-          animate={{
-            x: [0, -1920],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        >
-          {[...exploreImages, ...exploreImages].map((image, index) => (
-            <motion.div
-              key={index}
-              className="relative min-w-[250px] h-[300px] rounded-lg overflow-hidden"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-            >
-              <img
-                src={image}
-                alt={`Explore ${index + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            </motion.div>
-          ))}
-        </motion.div>
+      <section className="py-10 relative w-screen overflow-hidden">
+        <div className="container mx-auto px-8">
+          <div className="flex gap-4 overflow-x-hidden">
+            {exploreImages.map((image, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ 
+                  duration: 0.3,
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 10
+                }}
+                className="relative flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden"
+              >
+                <img
+                  src={image}
+                  alt={`Explore ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Footer */}

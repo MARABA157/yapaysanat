@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
-import { Home } from '@/pages/Home';
-import { NotFound } from '@/pages/NotFound';
+import Home from '@/pages/Home';
+import NotFound from '@/pages/NotFound';
 import Gallery from '@/pages/Gallery';
 import Profile from '@/pages/Profile';
-import { Settings } from '@/pages/Settings';
+import Settings from '@/pages/Settings';
 import Search from '@/pages/Search';
 import Premium from '@/pages/Premium';
 import About from '@/pages/About';
@@ -12,7 +12,7 @@ import Privacy from '@/pages/Privacy';
 // Generate Routes
 import ImageGeneration from '@/pages/generate/image';
 import AudioGeneration from '@/pages/generate/audio';
-import { VideoGeneration } from '@/pages/generate/video';
+import VideoGeneration from '@/pages/generate/video';
 import ScriptGeneration from '@/pages/generate/script';
 
 // Edit Routes
@@ -23,7 +23,7 @@ import VideoEditor from '@/pages/edit/video';
 import AIMusicGeneration from '@/pages/ai-music';
 import Chat from '@/pages/chat/Chat';
 
-export function AppRoutes() {
+const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -54,4 +54,6 @@ export function AppRoutes() {
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
-}
+};
+
+export default AppRoutes;

@@ -3,62 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Palette, Search, User, Sparkles, Crown, GraduationCap, Users, LogIn, UserPlus, Brush, Paintbrush, Pencil, Eraser, Scissors, Wand2, Sun, Moon, Lightbulb, Map } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuGroup,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+import { Menu, X, Palette, Search, User, Sparkles, Crown, GraduationCap, Users, LogIn, UserPlus, Brush, Paintbrush, Pencil, Eraser, Scissors, Wand2, Sun, Moon, Lightbulb } from 'lucide-react';
 import '@/styles/navigation.css';
 import '@/styles/lamp.css';
-
-const siteMap = {
-  "Ana Sayfalar": [
-    { title: "Ana Sayfa", path: "/" },
-    { title: "Galeri", path: "/gallery" },
-    { title: "Keşfet", path: "/explore" },
-    { title: "Eğitimler", path: "/education/tutorials" }
-  ],
-  "Yapay Zeka": [
-    { title: "AI Sanat", path: "/ai-art" },
-    { title: "AI Sohbet", path: "/ai-chat" },
-    { title: "AI Video", path: "/ai-video" },
-    { title: "AI Müzik", path: "/ai-music" },
-    { title: "AI Workshop", path: "/ai-workshop" },
-    { title: "Görüntü Düzenleme", path: "/ai/image-edit" },
-    { title: "Video Düzenleme", path: "/ai/video-edit" },
-    { title: "Ses İşleme", path: "/ai/audio" },
-    { title: "Senaryo Yazma", path: "/ai/script" },
-    { title: "Sanat Üretimi", path: "/ai/generate" }
-  ],
-  "Kullanıcı": [
-    { title: "Giriş", path: "/auth/login" },
-    { title: "Kayıt", path: "/auth/register" },
-    { title: "Profil", path: "/profile" },
-    { title: "Mesajlar", path: "/messages" },
-    { title: "Ayarlar", path: "/settings" },
-    { title: "Güvenlik Ayarları", path: "/settings/security" },
-    { title: "Koleksiyonlarım", path: "/user/collections" },
-    { title: "Favorilerim", path: "/user/favorites" },
-    { title: "Bildirimler", path: "/notifications" }
-  ],
-  "İçerik": [
-    { title: "Premium", path: "/premium" },
-    { title: "Yarışmalar", path: "/competitions" },
-    { title: "Etkinlikler", path: "/events" },
-    { title: "Eğitim Merkezi", path: "/education" },
-    { title: "Video Dersler", path: "/education/videos" },
-    { title: "Canlı Atölyeler", path: "/education/workshops" },
-    { title: "Hakkımızda", path: "/about" },
-    { title: "Gizlilik", path: "/privacy" },
-    { title: "Gelişmiş Arama", path: "/search" },
-    { title: "API Dokümantasyonu", path: "/docs/api" }
-  ]
-};
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -113,37 +60,6 @@ export function Header() {
               Sanat Galerisi
             </motion.span>
           </RouterLink>
-
-          {/* Site Haritası Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative overflow-hidden group bg-gradient-to-r from-violet-300/10 to-violet-500/10 hover:from-violet-300/20 hover:to-violet-500/20 border border-violet-500/20 text-violet-600 dark:text-violet-300 font-bold"
-              >
-                <Map className="mr-1 h-4 w-4" />
-                <span>Tüm Sayfalar</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64">
-              {Object.entries(siteMap).map(([category, items]) => (
-                <div key={category}>
-                  <DropdownMenuLabel className="font-bold text-sm text-violet-600 dark:text-violet-300">
-                    {category}
-                  </DropdownMenuLabel>
-                  <DropdownMenuGroup>
-                    {items.map((item) => (
-                      <DropdownMenuItem key={item.path} onClick={() => navigate(item.path)}>
-                        {item.title}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -155,42 +71,6 @@ export function Header() {
           >
             <Lightbulb />
           </button>
-
-          {/* Premium Button */}
-          <RouterLink to="/premium">
-            <motion.div
-              className="relative"
-              onMouseEnter={() => setIsHoveringPremium(true)}
-              onMouseLeave={() => setIsHoveringPremium(false)}
-              whileHover={{ scale: 1.05 }}
-            >
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative overflow-hidden group bg-gradient-to-r from-amber-300/10 to-amber-500/10 hover:from-amber-300/20 hover:to-amber-500/20 border border-amber-500/20 text-amber-600 dark:text-amber-300 font-bold"
-              >
-                <motion.div
-                  animate={{ 
-                    rotate: isHoveringPremium ? [0, getRandomRotation(), -getRandomRotation(), 0] : 0,
-                    scale: isHoveringPremium ? [1, getRandomScale(), getRandomScale(), 1] : 1
-                  }}
-                  transition={{ duration: 0.5, repeat: isHoveringPremium ? Infinity : 0 }}
-                  className="absolute inset-0 flex items-center justify-center opacity-20"
-                >
-                  <Wand2 className="w-20 h-20 text-amber-500" />
-                </motion.div>
-                <Crown className="mr-1 h-4 w-4" />
-                <span>Premium</span>
-                <motion.div
-                  animate={{ y: isHoveringPremium ? [0, -3, 0, 3, 0] : 0 }}
-                  transition={{ duration: 0.5, repeat: isHoveringPremium ? Infinity : 0 }}
-                  className="absolute -top-1 -right-1"
-                >
-                  <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse" />
-                </motion.div>
-              </Button>
-            </motion.div>
-          </RouterLink>
 
           {/* Login Button */}
           <RouterLink to="/auth/login">
@@ -262,6 +142,42 @@ export function Header() {
                   className="absolute -top-1 -right-1"
                 >
                   <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
+                </motion.div>
+              </Button>
+            </motion.div>
+          </RouterLink>
+
+          {/* Premium Button - En sağda */}
+          <RouterLink to="/premium">
+            <motion.div
+              className="relative"
+              onMouseEnter={() => setIsHoveringPremium(true)}
+              onMouseLeave={() => setIsHoveringPremium(false)}
+              whileHover={{ scale: 1.05 }}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative overflow-hidden group bg-gradient-to-r from-amber-300/10 to-amber-500/10 hover:from-amber-300/20 hover:to-amber-500/20 border border-amber-500/20 text-amber-600 dark:text-amber-300 font-bold"
+              >
+                <motion.div
+                  animate={{ 
+                    rotate: isHoveringPremium ? [0, getRandomRotation(), -getRandomRotation(), 0] : 0,
+                    scale: isHoveringPremium ? [1, getRandomScale(), getRandomScale(), 1] : 1
+                  }}
+                  transition={{ duration: 0.5, repeat: isHoveringPremium ? Infinity : 0 }}
+                  className="absolute inset-0 flex items-center justify-center opacity-20"
+                >
+                  <Wand2 className="w-20 h-20 text-amber-500" />
+                </motion.div>
+                <Crown className="mr-1 h-4 w-4" />
+                <span>Premium</span>
+                <motion.div
+                  animate={{ y: isHoveringPremium ? [0, -3, 0, 3, 0] : 0 }}
+                  transition={{ duration: 0.5, repeat: isHoveringPremium ? Infinity : 0 }}
+                  className="absolute -top-1 -right-1"
+                >
+                  <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse" />
                 </motion.div>
               </Button>
             </motion.div>

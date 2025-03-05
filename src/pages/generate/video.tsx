@@ -1,53 +1,62 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Video, Upload } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
+import { Loader2, Video } from 'lucide-react';
 
-// Açık kaynaklı video modelleri
-const OPEN_SOURCE_MODELS = [
+const VIDEO_STYLES = [
   {
-    id: 'modelscope',
-    name: 'ModelScope Text-to-Video',
-    description: 'ModelScope tarafından geliştirilen açık kaynaklı metin-video dönüşüm modeli',
-    endpoint: 'https://api.modelscope.cn/sample/text-to-video/1.0'
+    id: 'cinematic',
+    name: 'Sinematik',
+    description: 'Film kalitesinde profesyonel görünüm',
+    bgImage: 'https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg',
+    gradient: 'from-amber-500 to-orange-600',
   },
   {
-    id: 'zeroscope',
-    name: 'ZeroScope',
-    description: 'Stability AI tarafından geliştirilen açık kaynaklı video üretim modeli',
-    endpoint: 'https://api.zeroscope.ai/generate'
+    id: 'anime',
+    name: 'Anime',
+    description: 'Japon anime tarzında çizim',
+    bgImage: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
+    gradient: 'from-pink-500 to-rose-600',
   },
   {
-    id: 'animov',
-    name: 'Animov',
-    description: 'Açık kaynaklı anime tarzı video üretim modeli',
-    endpoint: 'https://api.animov.org/generate'
+    id: '3d-animation',
+    name: '3D Animasyon',
+    description: 'Üç boyutlu animasyon tarzı',
+    bgImage: 'https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg',
+    gradient: 'from-blue-500 to-indigo-600',
+  },
+  {
+    id: 'realistic',
+    name: 'Gerçekçi',
+    description: 'Gerçeğe yakın görünüm',
+    bgImage: 'https://images.pexels.com/photos/2873669/pexels-photo-2873669.jpeg',
+    gradient: 'from-emerald-500 to-green-600',
+  },
+  {
+    id: 'cartoon',
+    name: 'Çizgi Film',
+    description: 'Klasik çizgi film tarzı',
+    bgImage: 'https://images.pexels.com/photos/3045825/pexels-photo-3045825.jpeg',
+    gradient: 'from-purple-500 to-violet-600',
+  },
+  {
+    id: 'pixel-art',
+    name: 'Piksel Sanatı',
+    description: 'Retro oyun tarzında piksel görünüm',
+    bgImage: 'https://images.pexels.com/photos/2115257/pexels-photo-2115257.jpeg',
+    gradient: 'from-red-500 to-rose-600',
   }
 ];
 
-export default function GenerateVideo() {
+export function VideoGeneration() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
-  const [selectedModel, setSelectedModel] = useState(OPEN_SOURCE_MODELS[0].id);
-  const [stylePreset, setStylePreset] = useState('');
-  const [referenceVideo, setReferenceVideo] = useState<File | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState(VIDEO_STYLES[0].id);
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
-
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'video/*': ['.mp4', '.webm']
-    },
-    maxFiles: 1,
-    onDrop: (acceptedFiles) => {
-      setReferenceVideo(acceptedFiles[0]);
-    }
-  });
 
   const handleGenerate = async () => {
     if (!prompt) {
@@ -62,24 +71,10 @@ export default function GenerateVideo() {
     setIsLoading(true);
 
     try {
-      const selectedModelConfig = OPEN_SOURCE_MODELS.find(m => m.id === selectedModel);
+      // Burada video oluşturma API'si entegre edilecek
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setGeneratedVideo('example.mp4');
       
-      const formData = new FormData();
-      formData.append('prompt', prompt);
-      formData.append('model', selectedModel);
-      if (stylePreset) formData.append('style', stylePreset);
-      if (referenceVideo) formData.append('reference', referenceVideo);
-
-      const response = await fetch(selectedModelConfig!.endpoint, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) throw new Error('Video oluşturma başarısız oldu');
-
-      const data = await response.json();
-      setGeneratedVideo(data.videoUrl);
-
       toast({
         title: "Başarılı!",
         description: "Video başarıyla oluşturuldu",
@@ -96,121 +91,127 @@ export default function GenerateVideo() {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-gradient-to-br from-black via-gray-900 to-purple-900">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto space-y-8"
-      >
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">
-            Video Oluştur
-          </h1>
-          <p className="text-white/60">
-            Açık kaynaklı yapay zeka modelleri ile yaratıcı videolar oluşturun
-          </p>
-        </div>
+    <div className="min-h-screen relative bg-slate-100">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/images/video-studio-bg.jpg')"
+        }}
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6 bg-white/5 backdrop-blur-xl p-6 rounded-xl border border-white/10">
-            {/* Model Seçimi */}
-            <div className="space-y-2">
-              <Label className="text-white">Model Seçin</Label>
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-lg text-white"
-              >
-                {OPEN_SOURCE_MODELS.map((model) => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-sm text-white/40">
-                {OPEN_SOURCE_MODELS.find(m => m.id === selectedModel)?.description}
+      {/* Content */}
+      <div className="relative z-10">
+        <div className="p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto space-y-8"
+          >
+            <div className="text-center space-y-2">
+              <h1 className="text-4xl font-bold text-slate-800">
+                Video Oluştur
+              </h1>
+              <p className="text-slate-600">
+                Yapay zeka ile yaratıcı videolar oluşturun
               </p>
             </div>
 
-            {/* Prompt */}
-            <div className="space-y-2">
-              <Label className="text-white">Video Açıklaması</Label>
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Videoda görmek istediğiniz şeyleri detaylı bir şekilde açıklayın..."
-                className="min-h-[100px] bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            {/* Style Preset */}
-            <div className="space-y-2">
-              <Label className="text-white">Stil (Opsiyonel)</Label>
-              <Input
-                value={stylePreset}
-                onChange={(e) => setStylePreset(e.target.value)}
-                placeholder="Örn: anime, sinematik, gerçekçi..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            {/* Referans Video */}
-            <div className="space-y-2">
-              <Label className="text-white">Referans Video (Opsiyonel)</Label>
-              <div
-                {...getRootProps()}
-                className="border-2 border-dashed border-white/10 rounded-lg p-6 cursor-pointer hover:border-white/20 transition-colors"
-              >
-                <input {...getInputProps()} />
-                <div className="flex flex-col items-center space-y-2 text-white/60">
-                  <Upload className="w-8 h-8" />
-                  <p>Video yüklemek için tıklayın veya sürükleyin</p>
-                  {referenceVideo && (
-                    <p className="text-sm text-white/80">{referenceVideo.name}</p>
-                  )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6 bg-black/80 backdrop-blur-xl p-6 rounded-xl border border-white/10 shadow-lg">
+                {/* Prompt */}
+                <div className="space-y-2">
+                  <Label className="text-white">Video Açıklaması</Label>
+                  <Textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Videoda görmek istediğiniz şeyleri detaylı bir şekilde açıklayın..."
+                    className="min-h-[100px] bg-black/50 border-white/10 text-white placeholder:text-white/40"
+                  />
                 </div>
+
+                {/* Style Selection */}
+                <div className="space-y-2">
+                  <Label className="text-white">Video Stili</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {VIDEO_STYLES.map((style) => (
+                      <button
+                        key={style.id}
+                        onClick={() => setSelectedStyle(style.id)}
+                        className={`relative h-32 rounded-xl text-left transition-all overflow-hidden group ${
+                          selectedStyle === style.id
+                            ? 'ring-2 ring-offset-2 ring-offset-black ring-white/50 scale-[1.02]'
+                            : 'hover:ring-1 hover:ring-white/30 hover:scale-[1.01]'
+                        }`}
+                      >
+                        {/* Style Background Image */}
+                        <div className="absolute inset-0">
+                          <img
+                            src={style.bgImage}
+                            alt={style.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className={`absolute inset-0 bg-gradient-to-br ${style.gradient} ${
+                            selectedStyle === style.id
+                              ? 'opacity-20'
+                              : 'opacity-25 group-hover:opacity-20'
+                            } transition-opacity`}
+                          />
+                        </div>
+                        
+                        {/* Style Content */}
+                        <div className="relative h-full p-4 flex flex-col justify-between">
+                          <div className="font-medium text-lg text-white">
+                            {style.name}
+                          </div>
+                          <div className="text-sm text-white/90">
+                            {style.description}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Generate Button */}
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-lg"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Video Oluşturuluyor...
+                    </>
+                  ) : (
+                    <>
+                      <Video className="w-4 h-4 mr-2" />
+                      Video Oluştur
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Preview */}
+              <div className="bg-black/80 backdrop-blur-xl p-6 rounded-xl border border-white/10 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">Önizleme</h2>
+                {generatedVideo ? (
+                  <video
+                    src={generatedVideo}
+                    controls
+                    className="w-full rounded-lg"
+                  />
+                ) : (
+                  <div className="aspect-video rounded-lg bg-black/50 flex items-center justify-center">
+                    <p className="text-white/40">Video oluşturulduktan sonra burada görünecek</p>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Generate Button */}
-            <Button
-              onClick={handleGenerate}
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Video Oluşturuluyor...
-                </>
-              ) : (
-                <>
-                  <Video className="w-4 h-4 mr-2" />
-                  Video Oluştur
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Preview */}
-          <div className="bg-white/5 backdrop-blur-xl p-6 rounded-xl border border-white/10">
-            <h2 className="text-xl font-semibold text-white mb-4">Önizleme</h2>
-            {generatedVideo ? (
-              <video
-                src={generatedVideo}
-                controls
-                className="w-full rounded-lg"
-              />
-            ) : (
-              <div className="aspect-video bg-white/5 rounded-lg flex items-center justify-center">
-                <p className="text-white/40">
-                  Oluşturulan video burada görüntülenecek
-                </p>
-              </div>
-            )}
-          </div>
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
