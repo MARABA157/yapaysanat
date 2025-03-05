@@ -51,7 +51,7 @@ const VIDEO_STYLES = [
   }
 ];
 
-export function VideoGeneration() {
+function VideoGeneration() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
@@ -215,3 +215,5 @@ export function VideoGeneration() {
     </div>
   );
 }
+
+export { VideoGeneration };
