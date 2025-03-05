@@ -86,11 +86,6 @@ const artStyles = [
     description: "Gece ışıklarıyla parlayan geleneksel Japon sokakları"
   },
   {
-    name: "Paris Sokakları",
-    image: "https://images.pexels.com/photos/2346/city-france-landmark-lights.jpg",
-    description: "Romantik Paris sokaklarından bir görünüm"
-  },
-  {
     name: "New York Sokakları",
     image: "https://images.pexels.com/photos/802024/pexels-photo-802024.jpeg",
     description: "New York'un ikonik caddeleri ve gökdelenleri"
@@ -104,6 +99,36 @@ const artStyles = [
     name: "Hindistan Sokakları",
     image: "https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg",
     description: "Hindistan'ın renkli ve canlı sokak yaşamı"
+  },
+  {
+    name: "Venedik Kanalları",
+    image: "https://images.pexels.com/photos/1796730/pexels-photo-1796730.jpeg",
+    description: "Venedik'in romantik kanalları ve gondolları"
+  },
+  {
+    name: "Amsterdam Kanalları",
+    image: "https://images.pexels.com/photos/1796701/pexels-photo-1796701.jpeg",
+    description: "Amsterdam'ın pitoresk kanal evleri"
+  },
+  {
+    name: "Santorini Manzarası",
+    image: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg",
+    description: "Yunanistan'ın beyaz evleri ve mavi kubbeleri"
+  },
+  {
+    name: "Kyoto Bahçeleri",
+    image: "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg",
+    description: "Japon bahçe sanatının en güzel örnekleri"
+  },
+  {
+    name: "Rio Sokakları",
+    image: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
+    description: "Brezilya'nın renkli ve canlı sokak sanatı"
+  },
+  {
+    name: "Dubai Mimarisi",
+    image: "https://images.pexels.com/photos/1707820/pexels-photo-1707820.jpeg",
+    description: "Modern mimarinin en etkileyici örnekleri"
   }
 ];
 
@@ -120,7 +145,7 @@ export function Home() {
           />
           <div className="absolute inset-0 bg-black/40" />
         </div>
-        <div className="container mx-auto px-8">
+        <div className="h-full relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -131,12 +156,6 @@ export function Home() {
             }}
             className="text-center space-y-6 relative z-10"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white">
-              Sanatın Eğlenceli Dünyasına
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-                Hoş Geldiniz! 🎨
-              </span>
-            </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Picasso'nun fırçası kadar yetenekli olmana gerek yok! 
               Yapay zeka ile sen de bir sanat dehası olabilirsin! 🚀
@@ -187,8 +206,8 @@ export function Home() {
             backgroundPosition: "center",
           }}
         />
-        <div className="container mx-auto px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="h-full relative">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 h-full">
             {artModules.map((module, index) => (
               <motion.div
                 key={index}
@@ -199,26 +218,29 @@ export function Home() {
                   rotate: [0, -2, 2, -2, 0],
                   transition: { duration: 0.3 }
                 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1
+                }}
+                className="relative group"
               >
                 <Link to={module.link}>
-                  <Card className="relative h-[280px] overflow-hidden group bg-white/10 backdrop-blur-sm border border-white/30 hover:border-white/50">
-                    <img
-                      src={module.bgImage}
+                  <Card className="relative overflow-hidden h-full bg-black">
+                    <img 
+                      src={module.bgImage} 
                       alt={module.title}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-                      <motion.div 
-                        className={`inline-flex p-3 rounded-full bg-gradient-to-br ${module.gradient} shadow-xl mb-4 shadow-white/10`}
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                      >
+                    <div className="relative h-full p-6 flex flex-col justify-between z-10">
+                      <div className="flex justify-between items-start">
                         <module.icon className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors drop-shadow-lg">{module.title}</h3>
-                      <p className="text-sm text-white group-hover:text-white transition-colors line-clamp-2 drop-shadow-lg">{module.description}</p>
+                        <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${module.gradient} opacity-75`} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-white mb-2">{module.title}</h3>
+                        <p className="text-gray-300 text-sm">{module.description}</p>
+                      </div>
                     </div>
                   </Card>
                 </Link>
@@ -228,33 +250,36 @@ export function Home() {
         </div>
       </section>
 
-      {/* Explore Section */}
-      <section className="py-10 relative w-screen overflow-hidden">
-        <div className="container mx-auto px-8">
-          <div className="overflow-x-auto py-8">
-            <div className="flex space-x-6 animate-scroll">
-              {artStyles.map((style, index) => (
-                <div
-                  key={index}
-                  className="flex-none w-96 h-96 relative group cursor-pointer"
-                >
-                  <img
-                    src={style.image}
-                    alt={style.name}
-                    className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <h3 className="text-xl font-bold mb-2">{style.name}</h3>
-                    <p className="text-sm">{style.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Keşfet Section */}
+      <section className="h-[300px] bg-black relative w-screen overflow-hidden">
+        <div className="h-full relative">
+          <motion.div
+            initial={{ x: 0 }}
+            animate={{ x: "-100%" }}
+            transition={{
+              duration: 80,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="flex gap-4 absolute h-full"
+            style={{ width: "fit-content" }}
+          >
+            {[...artStyles, ...artStyles].map((style, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                className="relative w-72 h-72 flex-shrink-0 overflow-hidden my-auto rounded-lg"
+              >
+                <img
+                  src={style.image}
+                  alt={style.name}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
     </div>
   );
 }
