@@ -1,29 +1,29 @@
 import { Routes, Route } from 'react-router-dom';
-import { Home } from '@/pages/Home.tsx';
-import { NotFound } from '@/pages/NotFound.tsx';
-import Gallery from '@/pages/Gallery.tsx';
-import Profile from '@/pages/Profile.tsx';
-import { Settings } from '@/pages/Settings.tsx';
-import Search from '@/pages/Search.tsx';
-import Premium from '@/pages/Premium.tsx';
-import About from '@/pages/About.tsx';
-import Privacy from '@/pages/Privacy.tsx';
-import AdminLogin from '@/pages/auth/login.tsx';
-import Register from '@/pages/auth/register.tsx';
+import { Home } from '@/pages/Home';
+import { NotFound } from '@/pages/NotFound';
+import Gallery from '@/pages/Gallery';
+import Profile from '@/pages/Profile';
+import { Settings } from '@/pages/Settings';
+import Search from '@/pages/Search';
+import Premium from '@/pages/Premium';
+import About from '@/pages/About';
+import Privacy from '@/pages/Privacy';
+import AdminLogin from '@/pages/auth/Login';
+import Register from '@/pages/auth/Register';
 
 // Generate Routes
-import ImageGeneration from '@/pages/generate/image.tsx';
-import AudioGeneration from '@/pages/generate/audio.tsx';
-import { VideoGeneration } from '@/pages/generate/video.tsx';
-import ScriptGeneration from '@/pages/generate/script.tsx';
+import ImageGeneration from '@/pages/generate/image';
+import AudioGeneration from '@/pages/generate/audio';
+import { VideoGeneration } from '@/pages/generate/video';
+import ScriptGeneration from '@/pages/generate/script';
 
 // Edit Routes
-import ImageEditor from '@/pages/edit/image.tsx';
-import VideoEditor from '@/pages/edit/video.tsx';
+import ImageEditor from '@/pages/edit/image';
+import VideoEditor from '@/pages/edit/video';
 
 // AI Routes
-import AIMusicGeneration from '@/pages/ai-music.tsx';
-import Chat from '@/pages/chat/Chat.tsx';
+import AIMusicGeneration from '@/pages/ai-music';
+import Chat from '@/pages/chat/Chat';
 
 export function AppRoutes() {
   return (
