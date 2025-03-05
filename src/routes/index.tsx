@@ -1,15 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
 import { Home } from '@/pages/Home';
 import { NotFound } from '@/pages/NotFound';
-import { Chat } from '@/pages/Chat';
-import { Gallery } from '@/pages/Gallery';
+import Chat from '@/pages/Chat';
+import Gallery from '@/pages/Gallery';
 import { Settings } from '@/pages/Settings';
-import { ImageGeneration } from '@/pages/generate/image';
-import { AudioGeneration } from '@/pages/generate/audio';
-import { ScriptGeneration } from '@/pages/generate/script';
-import { AIMusicGeneration } from '@/pages/ai-music';
-import { ImageEdit } from '@/pages/edit/image';
-import { VideoEdit } from '@/pages/edit/video';
+import ImageGeneration from '@/pages/generate/image';
+import AudioGeneration from '@/pages/generate/audio';
+import ScriptGeneration from '@/pages/generate/script';
+import AIMusicGeneration from '@/pages/ai-music';
+import ImageEdit from '@/pages/edit/image';
+import VideoEdit from '@/pages/edit/video';
 import { VideoGeneration } from '@/pages/generate/video';
 
 export const AppRoutes = () => {
