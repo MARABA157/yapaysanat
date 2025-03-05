@@ -90,7 +90,7 @@ const exploreImages = [
   "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg"
 ];
 
-export { function Home() {
+export function Home() {
   return (
     <div className="flex-1 w-screen">
       {/* Hero Section */}
@@ -244,4 +244,4 @@ export { function Home() {
       {/* Footer */}
     </div>
   );
-} }
+}
