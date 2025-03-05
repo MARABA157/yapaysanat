@@ -79,15 +79,32 @@ const artModules = [
   }
 ];
 
-const exploreImages = [
-  "https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg",
-  "https://images.pexels.com/photos/2559941/pexels-photo-2559941.jpeg",
-  "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg",
-  "https://images.pexels.com/photos/1123972/pexels-photo-1123972.jpeg",
-  "https://images.pexels.com/photos/2873669/pexels-photo-2873669.jpeg",
-  "https://images.pexels.com/photos/2887582/pexels-photo-2887582.jpeg",
-  "https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg",
-  "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg"
+const artStyles = [
+  {
+    name: "Japon Sokakları",
+    image: "https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg",
+    description: "Gece ışıklarıyla parlayan geleneksel Japon sokakları"
+  },
+  {
+    name: "Paris Sokakları",
+    image: "https://images.pexels.com/photos/2346/city-france-landmark-lights.jpg",
+    description: "Romantik Paris sokaklarından bir görünüm"
+  },
+  {
+    name: "New York Sokakları",
+    image: "https://images.pexels.com/photos/802024/pexels-photo-802024.jpeg",
+    description: "New York'un ikonik caddeleri ve gökdelenleri"
+  },
+  {
+    name: "İstanbul Sokakları",
+    image: "https://images.pexels.com/photos/3629813/pexels-photo-3629813.jpeg",
+    description: "İstanbul'un tarihi sokaklarından büyüleyici bir manzara"
+  },
+  {
+    name: "Hindistan Sokakları",
+    image: "https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg",
+    description: "Hindistan'ın renkli ve canlı sokak yaşamı"
+  }
 ];
 
 export function Home() {
@@ -214,29 +231,25 @@ export function Home() {
       {/* Explore Section */}
       <section className="py-10 relative w-screen overflow-hidden">
         <div className="container mx-auto px-8">
-          <div className="flex gap-4 overflow-x-hidden">
-            {exploreImages.map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
-                whileHover={{ scale: 1.05 }}
-                transition={{ 
-                  duration: 0.3,
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 120,
-                  damping: 10
-                }}
-                className="relative flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden"
-              >
-                <img
-                  src={image}
-                  alt={`Explore ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-            ))}
+          <div className="overflow-x-auto py-8">
+            <div className="flex space-x-6 animate-scroll">
+              {artStyles.map((style, index) => (
+                <div
+                  key={index}
+                  className="flex-none w-96 h-96 relative group cursor-pointer"
+                >
+                  <img
+                    src={style.image}
+                    alt={style.name}
+                    className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <h3 className="text-xl font-bold mb-2">{style.name}</h3>
+                    <p className="text-sm">{style.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
