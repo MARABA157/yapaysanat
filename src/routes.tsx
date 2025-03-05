@@ -1,29 +1,29 @@
 import { Routes, Route } from 'react-router-dom';
-import { Home } from '@/pages/Home';
-import { NotFound } from '@/pages/NotFound';
-import Gallery from '@/pages/Gallery';
-import Profile from '@/pages/Profile';
-import { Settings } from '@/pages/Settings';
-import Search from '@/pages/Search';
-import Premium from '@/pages/Premium';
-import About from '@/pages/About';
-import Privacy from '@/pages/Privacy';
-import AdminLogin from '@/pages/auth/login';
-import { Register } from '@/pages/auth/register';
+import { Home } from './pages/Home';
+import { NotFound } from './pages/NotFound';
+import Gallery from './pages/Gallery';
+import Profile from './pages/Profile';
+import { Settings } from './pages/Settings';
+import Search from './pages/Search';
+import Premium from './pages/Premium';
+import About from './pages/About';
+import Privacy from './pages/Privacy';
+import AdminLogin from './pages/auth/login';
+import Register from './pages/auth/register';
 
 // Generate Routes
-import ImageGeneration from '@/pages/generate/image';
-import AudioGeneration from '@/pages/generate/audio';
-import { VideoGeneration } from '@/pages/generate/video';
-import ScriptGeneration from '@/pages/generate/script';
+import ImageGeneration from './pages/generate/image';
+import AudioGeneration from './pages/generate/audio';
+import { VideoGeneration } from './pages/generate/video';
+import ScriptGeneration from './pages/generate/script';
 
 // Edit Routes
-import ImageEditor from '@/pages/edit/image';
-import VideoEditor from '@/pages/edit/video';
+import ImageEditor from './pages/edit/image';
+import VideoEditor from './pages/edit/video';
 
 // AI Routes
-import AIMusicGeneration from '@/pages/ai-music';
-import Chat from '@/pages/chat/Chat';
+import AIMusicGeneration from './pages/ai-music';
+import Chat from './pages/chat/Chat';
 
 export function AppRoutes() {
   return (
