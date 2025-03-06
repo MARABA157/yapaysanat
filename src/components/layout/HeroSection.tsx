@@ -9,7 +9,7 @@ const bounceAnimation = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      repeatType: "reverse",
+      repeatType: "loop" as const,
       ease: "easeInOut"
     }
   }
@@ -34,7 +34,7 @@ const floatAnimation = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      repeatType: "reverse",
+      repeatType: "mirror" as const,
       ease: "easeInOut"
     }
   }
@@ -52,8 +52,8 @@ const letterAnimation = {
 };
 
 export default function HeroSection() {
-  const title = "Sanat Galerisi 🎨";
-  const subtitle = "Hayal Et, Üret, Paylaş! 🚀";
+  const title = "Sanat Galerisi ";
+  const subtitle = "Hayal Et, Üret, Paylaş! ";
 
   return (
     <div className="relative min-h-[70vh] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-background via-background/90 to-background/80">
@@ -130,9 +130,9 @@ export default function HeroSection() {
                 animate="animate"
                 className="text-5xl md:text-6xl lg:text-7xl font-bold inline-block"
                 style={{
-                  color: char === "🎨" ? "inherit" : "transparent",
-                  backgroundClip: char === "🎨" ? "inherit" : "text",
-                  backgroundImage: char === "🎨" ? "none" : "linear-gradient(to right, #9333ea, #ec4899, #3b82f6)"
+                  color: char === "" ? "inherit" : "transparent",
+                  backgroundClip: char === "" ? "inherit" : "text",
+                  backgroundImage: char === "" ? "none" : "linear-gradient(to right, #9333ea, #ec4899, #3b82f6)"
                 }}
               >
                 {char}
@@ -161,7 +161,7 @@ export default function HeroSection() {
             className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:opacity-90 group"
           >
             <motion.span {...bounceAnimation}>
-              🎨 Keşfet
+               Keşfet
             </motion.span>
             <motion.div
               className="ml-2"
@@ -171,7 +171,7 @@ export default function HeroSection() {
               transition={{
                 duration: 1,
                 repeat: Infinity,
-                repeatType: "reverse",
+                repeatType: "mirror" as const,
               }}
             >
               <Sparkles className="w-5 h-5" />
@@ -184,7 +184,7 @@ export default function HeroSection() {
             className="group"
           >
             <motion.span {...bounceAnimation}>
-              🚀 Başla
+               Başla
             </motion.span>
             <motion.div
               className="ml-2"
@@ -194,7 +194,7 @@ export default function HeroSection() {
               transition={{
                 duration: 0.5,
                 repeat: Infinity,
-                repeatType: "reverse",
+                repeatType: "mirror" as const,
               }}
             >
               <PartyPopper className="w-5 h-5" />

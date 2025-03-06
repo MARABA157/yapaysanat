@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export function NotFound() {
+function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <div className="text-center space-y-8">
@@ -42,3 +42,5 @@ export function NotFound() {
     </div>
   );
 }
+
+export default NotFound;

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/components/theme-provider';
 
-export function Settings() {
+function Settings() {
   const { user } = useAuthContext();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -69,3 +69,5 @@ export function Settings() {
     </div>
   );
 }
+
+export default Settings;

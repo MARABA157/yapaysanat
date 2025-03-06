@@ -216,4 +216,4 @@ function VideoGeneration() {
   );
 }
 
-export { VideoGeneration };
+export default VideoGeneration;
