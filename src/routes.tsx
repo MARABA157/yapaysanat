@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
-import { Home } from '@/pages/Home';
-import { NotFound } from '@/pages/NotFound';
+import Home from '@/pages/Home';
+import NotFound from '@/pages/NotFound';
 import Gallery from '@/pages/Gallery';
 import Profile from '@/pages/Profile';
-import { Settings } from '@/pages/Settings';
+import Settings from '@/pages/Settings';
 import Search from '@/pages/Search';
 import Premium from '@/pages/Premium';
 import About from '@/pages/About';
@@ -15,7 +15,7 @@ import Register from '@/pages/auth/Register';
 // Generate Routes
 import ImageGeneration from '@/pages/generate/image';
 import AudioGeneration from '@/pages/generate/audio';
-import { VideoGeneration } from '@/pages/generate/video';
+import VideoGeneration from '@/pages/generate/video';
 import ScriptGeneration from '@/pages/generate/script';
 
 // Edit Routes
