@@ -83,7 +83,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="relative overflow-hidden group bg-gradient-to-r from-blue-300/10 to-blue-500/10 hover:from-blue-300/20 hover:to-blue-500/20 border border-blue-500/20 text-blue-600 dark:text-blue-300 font-bold"
+                className="relative overflow-hidden group bg-gradient-to-r from-violet-300/10 to-pink-500/10 hover:from-violet-300/20 hover:to-pink-500/20 border border-pink-500/20 text-pink-600 dark:text-pink-300 font-bold"
               >
                 <motion.div
                   animate={{ 
@@ -93,7 +93,7 @@ export function Header() {
                   transition={{ duration: 0.5, repeat: isHoveringLogin ? Infinity : 0 }}
                   className="absolute inset-0 flex items-center justify-center opacity-20"
                 >
-                  <Brush className="w-20 h-20 text-blue-500" />
+                  <Brush className="w-20 h-20 text-pink-500" />
                 </motion.div>
                 <LogIn className="mr-1 h-4 w-4" />
                 <span>Giriş Yap</span>
@@ -102,7 +102,7 @@ export function Header() {
                   transition={{ duration: 1, repeat: isHoveringLogin ? Infinity : 0 }}
                   className="absolute -top-1 -right-1"
                 >
-                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+                  <div className="w-3 h-3 bg-pink-500 rounded-full animate-pulse" />
                 </motion.div>
               </Button>
             </motion.div>

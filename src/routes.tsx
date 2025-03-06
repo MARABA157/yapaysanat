@@ -8,7 +8,8 @@ import Search from '@/pages/Search';
 import Premium from '@/pages/Premium';
 import About from '@/pages/About';
 import Privacy from '@/pages/Privacy';
-import AdminLogin from '@/pages/auth/Login';
+import Login from '@/pages/auth/Login';
+import AdminLogin from '@/pages/auth/AdminLogin';
 import Register from '@/pages/auth/Register';
 
 // Generate Routes
@@ -39,7 +40,8 @@ export function AppRoutes() {
       <Route path="/privacy" element={<Privacy />} />
       
       {/* Auth Routes */}
-      <Route path="/auth/login" element={<AdminLogin />} />
+      <Route path="/auth/login" element={<Login />} />
+      <Route path="/auth/admin" element={<AdminLogin />} />
       <Route path="/auth/register" element={<Register />} />
       
       {/* Generate Routes */}

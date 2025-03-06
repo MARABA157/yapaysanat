@@ -156,6 +156,60 @@ export function Home() {
             }}
             className="text-center space-y-6 relative z-10"
           >
+            <div className="space-y-4">
+              {/* Animasyonlu Başlık */}
+              <motion.h1 
+                className="text-6xl md:text-7xl lg:text-8xl font-bold"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.2,
+                  ease: [0, 0.71, 0.2, 1.01]
+                }}
+              >
+                <motion.span
+                  className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500"
+                  animate={{
+                    y: [-10, 0, -5, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                >
+                  Sanat
+                </motion.span>{" "}
+                <motion.span
+                  className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+                  animate={{
+                    y: [0, -10, 0, -5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    delay: 0.5,
+                  }}
+                >
+                  Galerisi
+                </motion.span>{" "}
+                <motion.span
+                  className="inline-block"
+                  animate={{
+                    rotate: [-5, 5, -5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                >
+                  🎨
+                </motion.span>
+              </motion.h1>
+            </div>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Picasso'nun fırçası kadar yetenekli olmana gerek yok! 
               Yapay zeka ile sen de bir sanat dehası olabilirsin! 🚀
