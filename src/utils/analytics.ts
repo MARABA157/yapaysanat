@@ -1,4 +1,4 @@
-import { environment } from './environment';
+import { supabase } from '@/lib/supabase';
 
 interface AnalyticsEvent {
   name: string;
@@ -6,24 +6,46 @@ interface AnalyticsEvent {
 }
 
 class Analytics {
+  private static instance: Analytics;
   private initialized = false;
+  private userId: string | null = null;
+
+  private constructor() {}
+
+  static getInstance(): Analytics {
+    if (!Analytics.instance) {
+      Analytics.instance = new Analytics();
+    }
+    return Analytics.instance;
+  }
 
   init() {
     if (this.initialized) {
       return;
     }
-
-    // Analytics initialization code here
     this.initialized = true;
   }
 
-  trackEvent(event: AnalyticsEvent) {
+  setUserId(userId: string) {
+    this.userId = userId;
+  }
+
+  async trackEvent(event: AnalyticsEvent) {
     if (!this.initialized) {
       this.init();
     }
 
-    // Track event code here
-    console.log('Analytics event:', event);
+    if (!this.userId) return;
+
+    try {
+      await supabase.from('analytics_events').insert({
+        user_id: this.userId,
+        event_name: event.name,
+        properties: event.properties,
+      });
+    } catch (error) {
+      console.error('Error tracking event:', error);
+    }
   }
 
   trackPageView(path: string) {
@@ -74,4 +96,4 @@ class Analytics {
   }
 }
 
-export const analytics = new Analytics();
+export const analytics = Analytics.getInstance();
