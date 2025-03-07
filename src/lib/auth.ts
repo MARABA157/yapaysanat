@@ -187,36 +187,53 @@ export const useUserProtection = () => {
 
 /**
  * Google ile girişi destekler
+ * Not: Şu anda bakımda
  */
 export async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`
-    }
-  });
-
-  if (error) throw error;
-  return data;
-}
-
-/**
- * Apple ile girişi destekler
- */
-export async function signInWithApple() {
   try {
+    // localStorage'dan yönlendirme bilgisini al
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+    
+    // Doğrudan tarayıcı yönlendirmesi kullanarak Google ile giriş
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
+      provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}${redirectPath}`,
       }
     });
 
     if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Apple ile giriş hatası:', error);
-    throw error;
+    
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Google login error:', error);
+    return { data: null, error };
+  }
+}
+
+/**
+ * Apple ID ile girişi destekler
+ */
+export async function signInWithApple() {
+  try {
+    // localStorage'dan yönlendirme bilgisini al
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+    
+    // Doğrudan tarayıcı yönlendirmesi kullanarak Apple ile giriş
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: `${window.location.origin}${redirectPath}`,
+        skipBrowserRedirect: false
+      }
+    });
+
+    if (error) throw error;
+    
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Apple login error:', error);
+    return { data: null, error };
   }
 }
 
@@ -225,18 +242,21 @@ export async function signInWithApple() {
  */
 export async function signInWithMicrosoft() {
   try {
+    // Doğrudan tarayıcı yönlendirmesi kullanarak Microsoft ile giriş
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}`,
+        skipBrowserRedirect: false
       }
     });
 
     if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Microsoft ile giriş hatası:', error);
-    throw error;
+    
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Microsoft login error:', error);
+    return { data: null, error };
   }
 }
 
