@@ -13,7 +13,6 @@ import { FaGoogle, FaApple, FaMicrosoft } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { AiFillApple } from 'react-icons/ai';
 import { BsMicrosoft } from 'react-icons/bs';
-import { toast } from 'sonner';
 
 interface FormData {
   email: string;
@@ -89,11 +88,19 @@ export default function Login() {
       
       if (error) {
         console.error('Apple login error:', error);
-        toast.error('Apple ID ile giriş başarısız. Lütfen tekrar deneyin.');
+        toast({
+          title: "Giriş Hatası",
+          description: "Apple ID ile giriş başarısız. Lütfen tekrar deneyin.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Apple login error:', error);
-      toast.error('Apple ID ile giriş başarısız. Lütfen tekrar deneyin.');
+      toast({
+        title: "Giriş Hatası",
+        description: "Apple ID ile giriş başarısız. Lütfen tekrar deneyin.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(prev => ({ ...prev, apple: false }));
     }
@@ -107,11 +114,19 @@ export default function Login() {
       
       if (error) {
         console.error('Microsoft login error:', error);
-        toast.error('Microsoft ile giriş başarısız. Lütfen tekrar deneyin.');
+        toast({
+          title: "Giriş Hatası",
+          description: "Microsoft ile giriş başarısız. Lütfen tekrar deneyin.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Microsoft login error:', error);
-      toast.error('Microsoft ile giriş başarısız. Lütfen tekrar deneyin.');
+      toast({
+        title: "Giriş Hatası",
+        description: "Microsoft ile giriş başarısız. Lütfen tekrar deneyin.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(prev => ({ ...prev, microsoft: false }));
     }
@@ -249,7 +264,11 @@ export default function Login() {
               <Button
                 variant="outline"
                 className="w-full flex items-center justify-center gap-2 opacity-70"
-                onClick={() => toast.error('Bu özellik şu anda kullanılamıyor. Lütfen Google ile giriş yapın.')}
+                onClick={() => toast({
+                  title: "Giriş Hatası",
+                  description: "Bu özellik şu anda kullanılamıyor. Lütfen e-posta ve şifre ile giriş yapın.",
+                  variant: "destructive",
+                })}
                 disabled={true}
               >
                 {isLoading.apple ? (
@@ -263,7 +282,11 @@ export default function Login() {
               <Button
                 variant="outline"
                 className="w-full flex items-center justify-center gap-2 opacity-70"
-                onClick={() => toast.error('Bu özellik şu anda kullanılamıyor. Lütfen Google ile giriş yapın.')}
+                onClick={() => toast({
+                  title: "Giriş Hatası",
+                  description: "Bu özellik şu anda kullanılamıyor. Lütfen e-posta ve şifre ile giriş yapın.",
+                  variant: "destructive",
+                })}
                 disabled={true}
               >
                 {isLoading.microsoft ? (
