@@ -1,116 +1,307 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Video, Upload, Scissors, Wand2, Download, Share2, Play, Pause, Film, Clapperboard, FastForward, Rewind } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Upload, Play, Pause, Scissors, Wand2, RotateCcw, Download, Share2 } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
+import { Toaster } from '@/components/ui/toaster';
+
+// Özel stil tanımı
+const pageStyle: React.CSSProperties = {
+  backgroundImage: 'url(/images/jakob-owens-CiUR8zISX60-unsplash.jpg)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundAttachment: 'fixed',
+  minHeight: '100vh',
+  position: 'relative',
+};
+
+const overlayStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  zIndex: -1,
+};
 
 export default function VideoEditor() {
-  const [selectedVideo, setSelectedVideo] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(100);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [videoFilters, setVideoFilters] = useState<string>('');
+  const [playbackRate, setPlaybackRate] = useState<number>(1);
+  const [startTime, setStartTime] = useState<number>(0);
+  const [endTime, setEndTime] = useState<number>(100);
+  const [duration, setDuration] = useState<number>(0);
+  const [isProcessed, setIsProcessed] = useState(false);
+  const [videoName, setVideoName] = useState<string>('');
 
-  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      setSelectedVideo(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      setSelectedVideo(url);
+      setVideoName(file.name);
+      resetFilters();
+      setIsProcessed(false);
     }
   };
 
-  const handleProcess = async () => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-    }, 2000);
+  const resetFilters = () => {
+    setVideoFilters('');
+    setPlaybackRate(1);
+    setStartTime(0);
+    if (videoRef.current) {
+      videoRef.current.style.filter = '';
+      videoRef.current.playbackRate = 1;
+      videoRef.current.currentTime = 0;
+    }
   };
 
-  const videoEffects = [
-    { id: 'blur', label: 'Bulanıklaştır', icon: '🌫️' },
-    { id: 'bright', label: 'Parlaklık', icon: '✨' },
-    { id: 'contrast', label: 'Kontrast', icon: '🎨' },
-    { id: 'saturation', label: 'Doygunluk', icon: '🌈' },
-    { id: 'speed', label: 'Hız', icon: '⚡' },
-    { id: 'reverse', label: 'Ters Oynat', icon: '↩️' },
-  ];
+  useEffect(() => {
+    if (videoRef.current && selectedVideo) {
+      videoRef.current.onloadedmetadata = () => {
+        if (videoRef.current) {
+          setDuration(videoRef.current.duration);
+          setEndTime(videoRef.current.duration);
+        }
+      };
+    }
+  }, [selectedVideo]);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const applyBlur = () => {
+    setIsProcessing(true);
+    toast({
+      title: "Bulanıklaştırma uygulanıyor",
+      description: "Video bulanıklaştırılıyor...",
+    });
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        const newFilter = 'blur(5px)';
+        videoRef.current.style.filter = newFilter;
+        setVideoFilters(newFilter);
+      }
+
+      setIsProcessing(false);
+      toast({
+        title: "İşlem tamamlandı",
+        description: "Bulanıklaştırma efekti uygulandı.",
+      });
+    }, 500);
+  };
+
+  const applyBrightness = () => {
+    setIsProcessing(true);
+    toast({
+      title: "Parlaklık ayarlanıyor",
+      description: "Video parlaklığı artırılıyor...",
+    });
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        const newFilter = 'brightness(1.5)';
+        videoRef.current.style.filter = newFilter;
+        setVideoFilters(newFilter);
+      }
+
+      setIsProcessing(false);
+      toast({
+        title: "İşlem tamamlandı",
+        description: "Parlaklık efekti uygulandı.",
+      });
+    }, 500);
+  };
+
+  const applyContrast = () => {
+    setIsProcessing(true);
+    toast({
+      title: "Kontrast ayarlanıyor",
+      description: "Video kontrastı artırılıyor...",
+    });
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        const newFilter = 'contrast(1.5)';
+        videoRef.current.style.filter = newFilter;
+        setVideoFilters(newFilter);
+      }
+
+      setIsProcessing(false);
+      toast({
+        title: "İşlem tamamlandı",
+        description: "Kontrast efekti uygulandı.",
+      });
+    }, 500);
+  };
+
+  const applyGrayscale = () => {
+    setIsProcessing(true);
+    toast({
+      title: "Siyah-beyaz efekti uygulanıyor",
+      description: "Video siyah-beyaz yapılıyor...",
+    });
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        const newFilter = 'grayscale(1)';
+        videoRef.current.style.filter = newFilter;
+        setVideoFilters(newFilter);
+      }
+
+      setIsProcessing(false);
+      toast({
+        title: "İşlem tamamlandı",
+        description: "Siyah-beyaz efekti uygulandı.",
+      });
+    }, 500);
+  };
+
+  const applySpeedChange = (speed: number) => {
+    setIsProcessing(true);
+    toast({
+      title: "Hız değiştiriliyor",
+      description: `Video hızı ${speed}x yapılıyor...`,
+    });
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = speed;
+        setPlaybackRate(speed);
+      }
+
+      setIsProcessing(false);
+      toast({
+        title: "İşlem tamamlandı",
+        description: `Video hızı ${speed}x olarak ayarlandı.`,
+      });
+    }, 500);
+  };
+
+  const trimVideo = () => {
+    setIsProcessing(true);
+    toast({
+      title: "Video kırpılıyor",
+      description: "Belirlenen aralık kırpılıyor...",
+    });
+
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = startTime;
+      }
+
+      setIsProcessing(false);
+      toast({
+        title: "İşlem tamamlandı",
+        description: `Video ${startTime.toFixed(1)} - ${endTime.toFixed(1)} saniye aralığına kırpıldı.`,
+      });
+    }, 500);
+  };
+
+  const processVideo = () => {
+    setIsProcessing(true);
+    toast({
+      title: "Video işleniyor",
+      description: "Tüm efektler uygulanıyor...",
+    });
+
+    setTimeout(() => {
+      setIsProcessing(false);
+      setIsProcessed(true);
+      toast({
+        title: "İşlem tamamlandı",
+        description: "Video başarıyla işlendi. Şu anda önizleme modundasınız.",
+      });
+    }, 1000);
+  };
+
+  const downloadVideo = () => {
+    if (!selectedVideo) return;
+
+    const a = document.createElement('a');
+    a.href = selectedVideo;
+    a.download = `edited_${videoName || 'video.mp4'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    toast({
+      title: "Video indiriliyor",
+      description: "İşlenen video indiriliyor...",
+    });
+  };
+
+  const shareVideo = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'İşlenen Video',
+        text: 'Yapay Sanat Galerisi ile düzenlediğim video',
+        url: window.location.href,
+      })
+      .then(() => {
+        toast({
+          title: "Paylaşım başarılı",
+          description: "Video bağlantısı paylaşıldı.",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Paylaşım hatası",
+          description: "Video paylaşılırken bir hata oluştu.",
+        });
+      });
+    } else {
+      toast({
+        title: "Paylaşım desteklenmiyor",
+        description: "Tarayıcınız paylaşım özelliğini desteklemiyor.",
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 dark:from-indigo-900 dark:to-purple-900 p-4">
-      {/* Eğlenceli Arka Plan Animasyonları */}
-      <div className="fixed inset-0 -z-10 opacity-20">
-        <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{ duration: 10, repeat: Infinity }}
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "url('/images/video-pattern.png')",
-            backgroundSize: '100px',
-          }}
-        />
-      </div>
+    <div style={pageStyle}>
+      <div style={overlayStyle}></div>
+      <div className="container mx-auto py-8 relative z-10">
+        <h1 className="text-3xl font-bold mb-6 text-white">Video Düzenleyici</h1>
 
-      {/* Başlık Animasyonu */}
-      <motion.div
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="text-center mb-8"
-      >
-        <h1 className="text-4xl font-bold text-indigo-600 dark:text-indigo-300 flex items-center justify-center gap-3">
-          <motion.span
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, 10, -10, 0]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            🎬
-          </motion.span>
-          Video Düzenleme Stüdyosu
-          <motion.span
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, -10, 10, 0]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            🎥
-          </motion.span>
-        </h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-gray-600 dark:text-gray-300 mt-2"
-        >
-          Videolarını profesyonel bir şekilde düzenle! 🎨
-        </motion.p>
-      </motion.div>
-
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Video Önizleme */}
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="lg:col-span-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl"
-          >
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 text-xl font-semibold text-indigo-600 dark:text-indigo-300">
-                <Film className="h-6 w-6" />
-                <span>Video Önizleme</span>
-              </div>
-
-              <div className="aspect-video rounded-lg border-2 border-dashed border-indigo-300 dark:border-indigo-600 bg-white/50 dark:bg-gray-700/50">
+          <div className="lg:col-span-2">
+            <Card className="p-4 bg-black/50 backdrop-blur-sm border-gray-700">
+              <div 
+                ref={videoContainerRef}
+                className="aspect-video bg-gray-900 rounded-lg overflow-hidden"
+              >
                 {selectedVideo ? (
-                  <video
-                    src={selectedVideo}
-                    className="w-full h-full rounded-lg"
+                  <video 
+                    ref={videoRef}
+                    src={selectedVideo} 
+                    className="w-full h-full object-contain"
                     controls
+                    onTimeUpdate={() => {
+                      if (videoRef.current && videoRef.current.currentTime >= endTime) {
+                        videoRef.current.pause();
+                        videoRef.current.currentTime = startTime;
+                        setIsPlaying(false);
+                      }
+                    }}
                   />
                 ) : (
                   <div className="h-full flex items-center justify-center">
@@ -119,174 +310,184 @@ export default function VideoEditor() {
                         type="file"
                         accept="video/*"
                         className="hidden"
-                        onChange={handleVideoUpload}
+                        onChange={handleFileChange}
                       />
-                      <Clapperboard className="h-16 w-16 mx-auto mb-2 text-indigo-500" />
-                      <p className="text-gray-500">Video yüklemek için tıkla 📽️</p>
+                      <div className="flex flex-col items-center">
+                        <Upload className="h-12 w-12 mb-2 text-gray-400" />
+                        <p className="text-gray-300">Video yüklemek için tıklayın</p>
+                      </div>
                     </label>
                   </div>
                 )}
               </div>
 
               {selectedVideo && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-4">
-                    <Button variant="outline" size="icon">
-                      <Rewind className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setIsPlaying(!isPlaying)}
-                    >
-                      {isPlaying ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button variant="outline" size="icon">
-                      <FastForward className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Slider
-                    value={[currentTime]}
-                    max={duration}
-                    step={1}
-                    className="w-full"
-                  />
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  <Button onClick={togglePlay} disabled={isProcessing}>
+                    {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                    {isPlaying ? 'Duraklat' : 'Oynat'}
+                  </Button>
+                  <Button variant="outline" onClick={resetFilters} disabled={isProcessing}>
+                    <RotateCcw size={16} className="mr-2" />
+                    Sıfırla
+                  </Button>
+
+                  {isProcessed && (
+                    <>
+                      <Button variant="outline" onClick={downloadVideo} disabled={isProcessing}>
+                        <Download size={16} className="mr-2" />
+                        İndir
+                      </Button>
+                      <Button variant="outline" onClick={shareVideo} disabled={isProcessing}>
+                        <Share2 size={16} className="mr-2" />
+                        Paylaş
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
-            </div>
-          </motion.div>
+            </Card>
+          </div>
 
           {/* Düzenleme Araçları */}
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl"
-          >
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 text-xl font-semibold text-indigo-600 dark:text-indigo-300">
-                <Scissors className="h-6 w-6" />
-                <span>Düzenleme Araçları</span>
-              </div>
-
-              <Tabs defaultValue="effects" className="w-full">
-                <TabsList className="w-full">
-                  <TabsTrigger value="effects" className="flex-1">Efektler</TabsTrigger>
-                  <TabsTrigger value="trim" className="flex-1">Kırpma</TabsTrigger>
-                  <TabsTrigger value="text" className="flex-1">Yazı</TabsTrigger>
+          <div>
+            <Card className="p-4 bg-black/50 backdrop-blur-sm border-gray-700">
+              <Tabs defaultValue="effects">
+                <TabsList className="grid grid-cols-3 mb-4">
+                  <TabsTrigger value="effects">Efektler</TabsTrigger>
+                  <TabsTrigger value="speed">Hız</TabsTrigger>
+                  <TabsTrigger value="trim">Kırpma</TabsTrigger>
                 </TabsList>
-                <TabsContent value="effects" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    {videoEffects.map((effect) => (
-                      <motion.button
-                        key={effect.id}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="p-4 rounded-xl bg-white/50 hover:bg-indigo-100 dark:bg-gray-700/50 dark:hover:bg-indigo-900/50 flex flex-col items-center gap-2"
-                      >
-                        <span className="text-2xl">{effect.icon}</span>
-                        <span>{effect.label}</span>
-                      </motion.button>
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="trim" className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Başlangıç Noktası</label>
-                      <Slider defaultValue={[0]} max={100} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Bitiş Noktası</label>
-                      <Slider defaultValue={[100]} max={100} step={1} />
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="text" className="space-y-4">
-                  <Input
-                    placeholder="Metni girin..."
-                    className="bg-white/50 dark:bg-gray-700/50"
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline">
-                      Yazı Ekle
+
+                <TabsContent value="effects">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      disabled={!selectedVideo || isProcessing}
+                      onClick={applyBlur}
+                    >
+                      Bulanıklaştır
                     </Button>
-                    <Button variant="outline">
-                      Altyazı Ekle
+                    <Button 
+                      variant="outline" 
+                      disabled={!selectedVideo || isProcessing}
+                      onClick={applyBrightness}
+                    >
+                      Parlaklık
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      disabled={!selectedVideo || isProcessing}
+                      onClick={applyContrast}
+                    >
+                      Kontrast
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      disabled={!selectedVideo || isProcessing}
+                      onClick={applyGrayscale}
+                    >
+                      Siyah-Beyaz
+                    </Button>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="speed">
+                  <div className="space-y-4">
+                    <p className="mb-2 text-gray-200">Oynatma Hızı: {playbackRate}x</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button 
+                        variant="outline" 
+                        disabled={!selectedVideo || isProcessing}
+                        onClick={() => applySpeedChange(0.5)}
+                      >
+                        0.5x
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        disabled={!selectedVideo || isProcessing}
+                        onClick={() => applySpeedChange(1)}
+                      >
+                        1x
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        disabled={!selectedVideo || isProcessing}
+                        onClick={() => applySpeedChange(1.5)}
+                      >
+                        1.5x
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        disabled={!selectedVideo || isProcessing}
+                        onClick={() => applySpeedChange(2)}
+                      >
+                        2x
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="trim">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 text-gray-200">Başlangıç: {startTime.toFixed(1)} sn</p>
+                      <Slider 
+                        disabled={!selectedVideo || isProcessing} 
+                        value={[startTime]} 
+                        max={duration} 
+                        step={0.1}
+                        onValueChange={(value) => {
+                          if (value[0] < endTime) {
+                            setStartTime(value[0]);
+                            if (videoRef.current) {
+                              videoRef.current.currentTime = value[0];
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <p className="mb-2 text-gray-200">Bitiş: {endTime.toFixed(1)} sn</p>
+                      <Slider 
+                        disabled={!selectedVideo || isProcessing} 
+                        value={[endTime]} 
+                        max={duration} 
+                        step={0.1}
+                        onValueChange={(value) => {
+                          if (value[0] > startTime) {
+                            setEndTime(value[0]);
+                          }
+                        }}
+                      />
+                    </div>
+                    <Button 
+                      disabled={!selectedVideo || isProcessing} 
+                      className="w-full"
+                      onClick={trimVideo}
+                    >
+                      <Scissors className="mr-2 h-4 w-4" />
+                      Kırp
                     </Button>
                   </div>
                 </TabsContent>
               </Tabs>
 
-              <div className="space-y-4">
-                <Button
-                  onClick={handleProcess}
+              <div className="mt-4">
+                <Button 
+                  className="w-full" 
                   disabled={!selectedVideo || isProcessing}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white"
+                  onClick={processVideo}
                 >
-                  {isProcessing ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Video className="h-5 w-5" />
-                    </motion.div>
-                  ) : (
-                    <>
-                      <Wand2 className="mr-2 h-5 w-5" />
-                      Videoyu İşle
-                    </>
-                  )}
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Videoyu İşle
                 </Button>
-
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1">
-                    <Download className="mr-2 h-4 w-4" />
-                    İndir
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Paylaş
-                  </Button>
-                </div>
               </div>
-            </div>
-          </motion.div>
+            </Card>
+          </div>
         </div>
 
-        {/* Eğlenceli İpuçları */}
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mt-8 text-center"
-        >
-          <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-300 mb-4">
-            🎯 Video Düzenleme İpuçları
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-white/60 dark:bg-gray-800/60 p-4 rounded-lg"
-            >
-              "Efektleri dengeli kullan!" 🎨
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-white/60 dark:bg-gray-800/60 p-4 rounded-lg"
-            >
-              "Geçişleri yumuşak yap!" 🌊
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-white/60 dark:bg-gray-800/60 p-4 rounded-lg"
-            >
-              "Müzik ve ses efektleri ekle!" 🎵
-            </motion.div>
-          </div>
-        </motion.div>
+        <Toaster />
       </div>
     </div>
   );

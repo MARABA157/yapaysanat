@@ -1,339 +1,332 @@
+import { useCallback, useMemo, memo, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  MessageSquare,
-  ImagePlus,
-  Video,
-  Music,
-  Headphones,
-  BookOpen,
-  Edit,
-  Film
-} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
+import { artModules } from "@/data/artModules";
+import { artStyles } from "@/data/artStyles";
+import LazyImage from "@/components/ui/lazy-image";
 
-const artModules = [
-  {
-    title: "AI Chat Asistanı",
-    description: "Yapay zeka destekli sanat asistanınız ile sohbet edin",
-    icon: MessageSquare,
-    gradient: "from-purple-600 to-blue-600",
-    bgImage: "https://images.pexels.com/photos/7130555/pexels-photo-7130555.jpeg",
-    link: "/chat"
-  },
-  {
-    title: "Resim Oluşturma",
-    description: "Hayal ettiğin resimleri yapay zeka ile yarat! ",
-    icon: ImagePlus,
-    gradient: "from-pink-500 via-rose-400 to-orange-500",
-    bgImage: "https://images.pexels.com/photos/20072/pexels-photo.jpg",
-    link: "/generate/image"
-  },
-  {
-    title: "Video Oluşturma",
-    description: "Metinden videoya, hayallerini canlandır! ",
-    icon: Video,
-    gradient: "from-purple-500 via-violet-400 to-indigo-500",
-    bgImage: "https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg",
-    link: "/generate/video"
-  },
-  {
-    title: "Ses Asistanı",
-    description: "Yapay zeka ile sesli asistan deneyimi! ",
-    icon: Headphones,
-    gradient: "from-teal-500 via-emerald-400 to-green-500",
-    bgImage: "https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg",
-    link: "/generate/audio"
-  },
-  {
-    title: "Müzik Yapay Zekası",
-    description: "Kendi müziğini yapay zeka ile bestele! ",
-    icon: Music,
-    gradient: "from-red-500 via-orange-400 to-yellow-500",
-    bgImage: "https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg",
-    link: "/ai-music"
-  },
-  {
-    title: "Senaryo Asistanı",
-    description: "Hikayeler ve senaryolar yapay zeka ile yazılır! ",
-    icon: BookOpen,
-    gradient: "from-cyan-500 via-blue-400 to-indigo-500",
-    bgImage: "https://images.pexels.com/photos/3059747/pexels-photo-3059747.jpeg",
-    link: "/generate/script"
-  },
-  {
-    title: "Resim Düzenleme",
-    description: "Fotoğraflarını profesyonelce düzenle! ",
-    icon: Edit,
-    gradient: "from-fuchsia-500 via-purple-400 to-pink-500",
-    bgImage: "https://images.pexels.com/photos/1191710/pexels-photo-1191710.jpeg",
-    link: "/edit/image"
-  },
-  {
-    title: "Video Düzenleme",
-    description: "Videolarını yapay zeka ile düzenle! ",
-    icon: Film,
-    gradient: "from-violet-500 via-purple-400 to-fuchsia-500",
-    bgImage: "https://images.pexels.com/photos/2544554/pexels-photo-2544554.jpeg",
-    link: "/edit/video"
-  }
-];
+// Resimleri önceden yüklemek için yardımcı fonksiyon
+const preloadImage = (src: string) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = reject;
+    img.src = src;
+  });
+};
 
-const artStyles = [
-  {
-    name: "Japon Sokakları",
-    image: "https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg",
-    description: "Gece ışıklarıyla parlayan geleneksel Japon sokakları"
-  },
-  {
-    name: "New York Sokakları",
-    image: "https://images.pexels.com/photos/802024/pexels-photo-802024.jpeg",
-    description: "New York'un ikonik caddeleri ve gökdelenleri"
-  },
-  {
-    name: "İstanbul Sokakları",
-    image: "https://images.pexels.com/photos/3629813/pexels-photo-3629813.jpeg",
-    description: "İstanbul'un tarihi sokaklarından büyüleyici bir manzara"
-  },
-  {
-    name: "Hindistan Sokakları",
-    image: "https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg",
-    description: "Hindistan'ın renkli ve canlı sokak yaşamı"
-  },
-  {
-    name: "Venedik Kanalları",
-    image: "https://images.pexels.com/photos/1796730/pexels-photo-1796730.jpeg",
-    description: "Venedik'in romantik kanalları ve gondolları"
-  },
-  {
-    name: "Amsterdam Kanalları",
-    image: "https://images.pexels.com/photos/1796701/pexels-photo-1796701.jpeg",
-    description: "Amsterdam'ın pitoresk kanal evleri"
-  },
-  {
-    name: "Santorini Manzarası",
-    image: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg",
-    description: "Yunanistan'ın beyaz evleri ve mavi kubbeleri"
-  },
-  {
-    name: "Kyoto Bahçeleri",
-    image: "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg",
-    description: "Japon bahçe sanatının en güzel örnekleri"
-  },
-  {
-    name: "Rio Sokakları",
-    image: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
-    description: "Brezilya'nın renkli ve canlı sokak sanatı"
-  },
-  {
-    name: "Dubai Mimarisi",
-    image: "https://images.pexels.com/photos/1707820/pexels-photo-1707820.jpeg",
-    description: "Modern mimarinin en etkileyici örnekleri"
-  }
-];
+// Optimize edilmiş animasyon konfigürasyonları
+const fadeInAnimation = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.8, ease: "easeOut" }
+};
+
+const titleAnimation = {
+  initial: { opacity: 0, scale: 0.9 },
+  animate: { opacity: 1, scale: 1 },
+  transition: { duration: 0.5, ease: [0, 0.71, 0.2, 1.01] }
+};
+
+// Optimize edilmiş bileşenler
+const ArtModuleCard = memo(({ module, index }: { module: any, index: number }) => {
+  // Modül arka plan resmini önceden yükle
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const img = new Image();
+      img.src = module.bgImage;
+    }
+  }, [module.bgImage]);
+
+  return (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0.6, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: 1.05 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{
+        duration: 0.3,
+        delay: Math.min(index * 0.03, 0.15) // Daha kısa gecikme
+      }}
+      className="relative group"
+    >
+      <Link to={module.link}>
+        <Card className="relative overflow-hidden h-full bg-black">
+          <div className="absolute inset-0 w-full h-full">
+            <LazyImage
+              src={module.bgImage}
+              alt={module.title}
+              priority={index < 4} // İlk 4 modül için öncelikli yükleme
+              className="w-full h-full opacity-60 group-hover:opacity-40 transition-opacity duration-300"
+              objectFit="cover"
+              objectPosition="center"
+            />
+          </div>
+          <div className="relative h-full p-3 sm:p-4 md:p-6 flex flex-col justify-between z-10">
+            <div className="flex justify-between items-start">
+              <module.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
+              <div className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-r ${module.gradient} opacity-75`} />
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-1 sm:mb-2">{module.title}</h3>
+              <p className="text-gray-300 text-xs sm:text-sm">{module.description}</p>
+            </div>
+          </div>
+        </Card>
+      </Link>
+    </motion.div>
+  );
+});
+
+const ArtStyleItem = memo(({ style, index, priority = false }: { style: any, index: number, priority?: boolean }) => (
+  <motion.div
+    key={index}
+    whileHover={{ scale: 1.05 }}
+    className="relative w-48 sm:w-56 md:w-64 h-48 sm:h-56 md:h-64 flex-shrink-0 overflow-hidden my-auto rounded-lg shadow-lg"
+  >
+    <LazyImage
+      src={style.image}
+      alt={style.name}
+      role="gallery"
+      priority={priority}
+      className="w-full h-full"
+      objectFit="cover"
+    />
+    <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors duration-300" />
+  </motion.div>
+));
+
+const HeroSection = memo(() => (
+  <section className="relative py-10 md:py-20 flex items-center justify-center overflow-hidden w-screen" style={{ height: '100vh' }}>
+    <div className="absolute inset-0">
+      <LazyImage 
+        src="/images/backgrounds/hero-bg.jpg" 
+        alt="Art Gallery" 
+        role="hero"
+        priority={true}
+        className="w-full h-full"
+        objectFit="cover"
+      />
+      <div className="absolute inset-0 bg-black/40" />
+    </div>
+    <div className="container mx-auto px-4 z-10 text-center">
+      <motion.div
+        {...fadeInAnimation}
+        className="max-w-4xl mx-auto"
+      >
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
+          <motion.span
+            className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500"
+            animate={{
+              y: [-5, 0, -3, 0],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          >
+            Sanat
+          </motion.span>{" "}
+          <motion.span
+            className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+            animate={{
+              y: [0, -5, 0, -3],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: 0.5,
+            }}
+          >
+            Galerisi
+          </motion.span>{" "}
+          <motion.span
+            className="inline-block"
+            animate={{
+              rotate: [-3, 3, -3],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          >
+            🎨
+          </motion.span>
+        </h1>
+        <p className="text-xl md:text-2xl text-white/80 mb-8 px-4 md:px-0">
+          Yapay zeka ile sanatın sınırlarını keşfedin ve kendi benzersiz eserlerinizi yaratın.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={() => {
+              document.getElementById('art-modules')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="w-full sm:w-auto px-8 py-3 rounded-full bg-black text-white font-medium border border-white/20 hover:bg-black/80 hover:border-white/30 transform hover:scale-105 transition-all duration-300"
+          >
+            Yapay Zekaları Keşfet 🤖
+          </button>
+          <Link 
+            to="/chat"
+            className="w-full sm:w-auto px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300"
+          >
+            Hemen Başla! 🎯
+          </Link>
+          <motion.div
+            animate={{
+              rotate: [0, -5, 5, -5, 0],
+            }}
+            transition={{
+              duration: 6, // 3'ten 6'ya çıkardım
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="text-2xl"
+          >
+            👋
+          </motion.div>
+        </div>
+      </motion.div>
+    </div>
+  </section>
+));
+
+// Art Modules Grid bileşeni
+const ArtModulesGrid = memo(() => {
+  // useMemo ile modülleri memoize et
+  const memoizedArtModules = useMemo(() => artModules, []);
+  
+  // Modül resimlerini önceden yükle
+  useEffect(() => {
+    // Sadece görünür alandaki modüllerin resimlerini önceden yükle
+    const preloadVisibleModuleImages = async () => {
+      // İlk 8 modülün resimlerini önceden yükle (tipik olarak görünür alandaki modüller)
+      const visibleModules = memoizedArtModules.slice(0, 8);
+      await Promise.all(
+        visibleModules.map(module => preloadImage(module.bgImage))
+      );
+    };
+    
+    preloadVisibleModuleImages();
+  }, [memoizedArtModules]);
+  
+  return (
+    <section id="art-modules" className="py-12 md:py-20 relative w-screen overflow-hidden">
+      <div className="absolute inset-0 bg-black/70">
+        <LazyImage 
+          src="/images/art-background.jpg" 
+          alt="Art Background" 
+          role="art-modules"
+          priority={true}
+          className="w-full h-full"
+          objectFit="cover"
+        />
+      </div>
+      <div className="h-full relative">
+        <motion.div
+          initial={{ opacity: 0.8 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true, amount: 0.1 }}
+          className="container mx-auto px-4 py-8"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-white">
+            <motion.span
+              initial={{ opacity: 0.8, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              viewport={{ once: true, amount: 0.8 }}
+              className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+            >
+              Yapay Zeka Araçları
+            </motion.span>
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 h-full">
+            {memoizedArtModules.map((module, index) => (
+              <ArtModuleCard key={module.title} module={module} index={index} />
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+});
+
+// Keşfet bölümü bileşeni
+const ArtStylesCarousel = memo(() => {
+  // useMemo ile stilleri memoize et
+  const memoizedArtStyles = useMemo(() => {
+    // Artık sadece 4 stil var, tekrar etmek için 3 kez göster
+    return [...artStyles, ...artStyles, ...artStyles];
+  }, []);
+  
+  // Resimleri önceden yükle
+  useEffect(() => {
+    // İlk 4 resmi önceden yükle
+    const preloadImages = async () => {
+      await Promise.all(
+        artStyles.map(style => preloadImage(style.image))
+      );
+    };
+    
+    preloadImages();
+  }, []);
+  
+  return (
+    <section className="h-[250px] sm:h-[280px] bg-black relative w-screen overflow-hidden py-4">
+      <div className="h-full relative">
+        <motion.div
+          initial={{ x: 0 }}
+          animate={{ x: "-100%" }}
+          transition={{
+            duration: 120, // Daha hızlı animasyon
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="flex gap-5 absolute h-full items-center"
+          style={{ width: "fit-content" }}
+        >
+          {memoizedArtStyles.map((style, index) => (
+            <ArtStyleItem 
+              key={`${style.name}-${index}`} 
+              style={style} 
+              index={index} 
+              priority={index < 4} // İlk 4 resim için öncelikli yükleme
+            />
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+});
 
 export default function Home() {
+  useEffect(() => {
+    // Arka plan resimlerini önceden yükleyin
+    const preloadBackgroundImages = async () => {
+      await Promise.all([
+        preloadImage("/images/backgrounds/hero-bg.jpg"),
+        preloadImage("/images/art-background.jpg"),
+      ]);
+    };
+    preloadBackgroundImages();
+  }, []);
+
   return (
     <div className="flex-1 w-screen">
       {/* Hero Section */}
-      <section className="relative py-20 flex items-center justify-center overflow-hidden w-screen" style={{ height: '100vh' }}>
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&q=80&w=1500" 
-            alt="Art Gallery" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
-        <div className="h-full relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 1.5,
-              delay: 0.5,
-              ease: "easeOut"
-            }}
-            className="text-center space-y-6 relative z-10"
-          >
-            <div className="space-y-4">
-              {/* Animasyonlu Başlık */}
-              <motion.h1 
-                className="text-6xl md:text-7xl lg:text-8xl font-bold"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.2,
-                  ease: [0, 0.71, 0.2, 1.01]
-                }}
-              >
-                <motion.span
-                  className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500"
-                  animate={{
-                    y: [-10, 0, -5, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }}
-                >
-                  Sanat
-                </motion.span>{" "}
-                <motion.span
-                  className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-                  animate={{
-                    y: [0, -10, 0, -5],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    delay: 0.5,
-                  }}
-                >
-                  Galerisi
-                </motion.span>{" "}
-                <motion.span
-                  className="inline-block"
-                  animate={{
-                    rotate: [-5, 5, -5],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }}
-                >
-                  🎨
-                </motion.span>
-              </motion.h1>
-            </div>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Picasso'nun fırçası kadar yetenekli olmana gerek yok! 
-              Yapay zeka ile sen de bir sanat dehası olabilirsin! 🚀
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center items-center">
-              <Link 
-                to="/chat"
-                className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300"
-              >
-                Hemen Başla! 🎯
-              </Link>
-              <button 
-                onClick={() => {
-                  document.getElementById('art-modules')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
-                className="px-8 py-3 rounded-full bg-black text-white font-medium border border-white/20 hover:bg-black/80 hover:border-white/30 transform hover:scale-105 transition-all duration-300"
-              >
-                Yapay Zekaları Keşfet 🤖
-              </button>
-              <motion.div
-                animate={{
-                  rotate: [0, -10, 10, -10, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="text-2xl"
-              >
-                👋
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Art Modules Grid */}
-      <section id="art-modules" className="py-20 relative w-screen">
-        <div 
-          className="absolute inset-0 bg-black/60"
-          style={{
-            backgroundImage: "url('https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="h-full relative">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 h-full">
-            {artModules.map((module, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                whileHover={{ 
-                  scale: 1.05,
-                  rotate: [0, -2, 2, -2, 0],
-                  transition: { duration: 0.3 }
-                }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
-                  delay: index * 0.1
-                }}
-                className="relative group"
-              >
-                <Link to={module.link}>
-                  <Card className="relative overflow-hidden h-full bg-black">
-                    <img 
-                      src={module.bgImage} 
-                      alt={module.title}
-                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300"
-                    />
-                    <div className="relative h-full p-6 flex flex-col justify-between z-10">
-                      <div className="flex justify-between items-start">
-                        <module.icon className="w-8 h-8 text-white" />
-                        <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${module.gradient} opacity-75`} />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-white mb-2">{module.title}</h3>
-                        <p className="text-gray-300 text-sm">{module.description}</p>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ArtModulesGrid />
 
       {/* Keşfet Section */}
-      <section className="h-[300px] bg-black relative w-screen overflow-hidden">
-        <div className="h-full relative">
-          <motion.div
-            initial={{ x: 0 }}
-            animate={{ x: "-100%" }}
-            transition={{
-              duration: 80,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="flex gap-4 absolute h-full"
-            style={{ width: "fit-content" }}
-          >
-            {[...artStyles, ...artStyles].map((style, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ scale: 1.05 }}
-                className="relative w-72 h-72 flex-shrink-0 overflow-hidden my-auto rounded-lg"
-              >
-                <img
-                  src={style.image}
-                  alt={style.name}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+      <ArtStylesCarousel />
     </div>
   );
 }

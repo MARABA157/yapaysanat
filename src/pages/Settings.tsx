@@ -1,22 +1,52 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/hooks/useAuthContext';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/components/theme-provider';
+import { Loader2 } from 'lucide-react';
 
 function Settings() {
-  const { user } = useAuthContext();
+  const { user: authUser } = useAuthContext();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth/login');
+    async function getUser() {
+      setLoading(true);
+      try {
+        // Supabase'den kullanıcı bilgilerini al
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setUser(user);
+        } else {
+          // Kullanıcı yoksa login sayfasına yönlendir
+          navigate('/auth/login');
+        }
+      } catch (error) {
+        console.error('Kullanıcı bilgileri alınamadı:', error);
+        navigate('/auth/login');
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [user, navigate]);
+
+    getUser();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!user) return null;
 
@@ -59,7 +89,7 @@ function Settings() {
               </div>
               <div>
                 <Label>Kullanıcı Adı</Label>
-                <p className="text-sm text-muted-foreground">{user.username}</p>
+                <p className="text-sm text-muted-foreground">{user.user_metadata?.username || 'Kullanıcı Adı Yok'}</p>
               </div>
               <Button variant="destructive">Hesabı Sil</Button>
             </div>

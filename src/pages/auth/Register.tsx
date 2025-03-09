@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Eye, EyeOff, UserPlus, ArrowRight, Loader2, Camera, Sparkles, Palette, Music, PartyPopper } from 'lucide-react';
+import { Eye, EyeOff, UserPlus, ArrowRight, Loader2, Sparkles, Palette, Music, PartyPopper } from 'lucide-react';
 import { supabase } from '@/lib/supabase'; // Import yolunu düzeltme
-import { useDropzone } from 'react-dropzone';
 import confetti from 'canvas-confetti';
 
 interface FormData {
@@ -15,8 +14,11 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-  avatar?: File;
   favoriteArt?: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
 }
 
 const artStyles = [
@@ -33,7 +35,6 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   
@@ -45,23 +46,7 @@ export default function Register() {
     favoriteArt: ''
   });
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'image/*': ['.png', '.jpg', '.jpeg']
-    },
-    maxFiles: 1,
-    onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (file) {
-        setFormData(prev => ({ ...prev, avatar: file }));
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setAvatarPreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  });
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,23 +57,52 @@ export default function Register() {
   };
 
   const validateForm = () => {
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Hata! 🚫",
-        description: "Şifreler eşleşmiyor.",
-        variant: "destructive",
-      });
-      return false;
+    let isValid = true;
+    const errors: { [key: string]: string } = {};
+
+    // Adım 1 doğrulamaları
+    if (currentStep === 0) {
+      if (!formData.username.trim()) {
+        errors.username = "Kullanıcı adı gereklidir";
+        isValid = false;
+      }
+
+      if (!formData.email.trim()) {
+        errors.email = "E-posta adresi gereklidir";
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        errors.email = "Geçerli bir e-posta adresi giriniz";
+        isValid = false;
+      }
     }
-    if (formData.password.length < 6) {
-      toast({
-        title: "Hata! 📏",
-        description: "Şifre en az 6 karakter olmalıdır.",
-        variant: "destructive",
-      });
-      return false;
+
+    // Adım 2 doğrulamaları
+    if (currentStep === 1) {
+      if (!formData.password) {
+        errors.password = "Şifre gereklidir";
+        isValid = false;
+      } else if (formData.password.length < 6) {
+        errors.password = "Şifre en az 6 karakter olmalıdır";
+        isValid = false;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        errors.confirmPassword = "Şifreler eşleşmiyor";
+        isValid = false;
+      }
     }
-    return true;
+
+    // Adım 3 doğrulamaları
+    if (currentStep === 2) {
+      if (!formData.favoriteArt) {
+        errors.favoriteArt = "Lütfen favori sanat stilinizi seçin";
+        isValid = false;
+      }
+    }
+
+    console.log("Form doğrulama sonucu:", isValid, errors);
+    setFormErrors(errors);
+    return isValid;
   };
 
   const triggerConfetti = () => {
@@ -133,72 +147,144 @@ export default function Register() {
     });
   };
 
-  const nextStep = () => {
-    if (currentStep === 2) {
+  const handleFinalSubmit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Son adım - kayıt işlemi başlatılıyor");
+    
+    // Form doğrulamasını yap
+    if (!validateForm()) {
+      console.log("Form doğrulama hatası");
+      return;
+    }
+    
+    setIsLoading(true);
+    console.log("Kayıt işlemi başlatılıyor...", formData);
+
+    // Supabase ile kullanıcı kaydı
+    supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/login`,
+        data: {
+          username: formData.username,
+          favorite_art: formData.favoriteArt,
+        }
+      }
+    })
+    .then(({ data: authData, error: authError }) => {
+      console.log("Supabase auth yanıtı:", authData, authError);
+      
+      if (authError) throw authError;
+      
+      // Başarılı kayıt bildirimi - profiles tablosu oluşturma işlemini kaldırdık
+      toast({
+        title: "Başarılı! 🎉",
+        description: "Hoş geldiniz! Sanat dünyasına adım attınız!",
+      });
+      
+      // Confetti efekti ve kutlama
       setShowCelebration(true);
       triggerConfetti();
       setTimeout(() => {
         navigate('/auth/login');
       }, 2000);
+    })
+    .catch((error) => {
+      console.error("Kayıt hatası:", error);
+      
+      // 429 hatası (çok fazla istek) için özel mesaj
+      if (error.status === 429) {
+        toast({
+          title: "Çok Fazla Deneme! ⏱️",
+          description: "Güvenlik nedeniyle, lütfen bir dakika bekleyip tekrar deneyin.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Hata! 😢",
+          description: error.message || "Kayıt işlemi sırasında bir hata oluştu.",
+          variant: "destructive",
+        });
+      }
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  };
+
+  const nextStep = () => {
+    // Mevcut adımın doğrulamasını yap
+    if (!validateForm()) {
+      console.log("Form doğrulama hatası - Bir sonraki adıma geçilemiyor");
+      return;
+    }
+
+    console.log("Bir sonraki adıma geçiliyor:", currentStep + 1);
+    
+    if (currentStep === 2) {
+      console.log("Son adımda bir sonraki adıma geçmek yerine form gönderimi yapılır");
+      // Son adımda bir sonraki adıma geçmek yerine form gönderimi yapılır
+      return;
     } else {
       setCurrentStep(prev => prev + 1);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!validateForm()) return;
     
     setIsLoading(true);
+    console.log("Kayıt işlemi başlatılıyor...", formData);
 
     try {
+      // Supabase ile kullanıcı kaydı
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/login`,
+          data: {
+            username: formData.username,
+            favorite_art: formData.favoriteArt,
+          }
+        }
       });
+
+      console.log("Supabase auth yanıtı:", authData, authError);
 
       if (authError) throw authError;
 
-      let avatarUrl = null;
-      if (formData.avatar) {
-        const fileExt = formData.avatar.name.split('.').pop();
-        const fileName = `${authData.user?.id}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(fileName, formData.avatar);
-
-        if (uploadError) throw uploadError;
-        
-        avatarUrl = `https://your-supabase-project.supabase.co/storage/v1/object/public/avatars/${fileName}`;
-      }
-
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            id: authData.user?.id,
-            username: formData.username,
-            avatar_url: avatarUrl,
-            favorite_art: formData.favoriteArt,
-            created_at: new Date().toISOString(),
-          }
-        ]);
-
-      if (profileError) throw profileError;
-
+      // Başarılı kayıt bildirimi
       toast({
         title: "Başarılı! 🎉",
         description: "Hoş geldiniz! Sanat dünyasına adım attınız!",
       });
 
-      nextStep();
+      // Confetti efekti ve kutlama
+      setShowCelebration(true);
+      triggerConfetti();
+      setTimeout(() => {
+        navigate('/auth/login');
+      }, 2000);
     } catch (error: any) {
-      toast({
-        title: "Hata! 😢",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error("Kayıt hatası:", error);
+      
+      // 429 hatası (çok fazla istek) için özel mesaj
+      if (error.status === 429) {
+        toast({
+          title: "Çok Fazla Deneme! ⏱️",
+          description: "Güvenlik nedeniyle, lütfen bir dakika bekleyip tekrar deneyin.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Hata! 😢",
+          description: error.message || "Kayıt işlemi sırasında bir hata oluştu.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -230,6 +316,9 @@ export default function Register() {
                 className="bg-muted/50"
                 required
               />
+              {formErrors.username && (
+                <div className="text-red-500 text-sm">{formErrors.username}</div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -244,6 +333,9 @@ export default function Register() {
                 className="bg-muted/50"
                 required
               />
+              {formErrors.email && (
+                <div className="text-red-500 text-sm">{formErrors.email}</div>
+              )}
             </div>
           </motion.div>
         );
@@ -286,6 +378,9 @@ export default function Register() {
                   )}
                 </button>
               </div>
+              {formErrors.password && (
+                <div className="text-red-500 text-sm">{formErrors.password}</div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -313,6 +408,9 @@ export default function Register() {
                   )}
                 </button>
               </div>
+              {formErrors.confirmPassword && (
+                <div className="text-red-500 text-sm">{formErrors.confirmPassword}</div>
+              )}
             </div>
           </motion.div>
         );
@@ -328,30 +426,6 @@ export default function Register() {
             <div className="text-center mb-6">
               <Sparkles className="w-12 h-12 mx-auto mb-2 text-primary animate-pulse" />
               <h2 className="text-2xl font-bold">Son Dokunuşlar! ✨</h2>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Profil Fotoğrafı</Label>
-              <div
-                {...getRootProps()}
-                className="relative w-32 h-32 mx-auto cursor-pointer rounded-full overflow-hidden group transition-transform hover:scale-105"
-              >
-                <input {...getInputProps()} />
-                {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt="Avatar preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-white text-sm">Fotoğraf Seç</p>
-                </div>
-              </div>
             </div>
 
             <div className="space-y-2">
@@ -373,6 +447,9 @@ export default function Register() {
                   </motion.button>
                 ))}
               </div>
+              {formErrors.favoriteArt && (
+                <div className="text-red-500 text-sm">{formErrors.favoriteArt}</div>
+              )}
             </div>
           </motion.div>
         );
@@ -443,12 +520,20 @@ export default function Register() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="w-16 h-16 bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center"
+              className="bg-card p-8 rounded-lg text-center"
             >
-              {currentStep === 0 && <UserPlus className="w-8 h-8 text-white" />}
-              {currentStep === 1 && <Eye className="w-8 h-8 text-white" />}
-              {currentStep === 2 && <Sparkles className="w-8 h-8 text-white" />}
+              <PartyPopper className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
+              <h2 className="text-2xl font-bold mb-2">Hoş Geldiniz! 🎉</h2>
+              <p className="text-muted-foreground">
+                Sanat dünyasına hoş geldiniz! Şimdi macera başlıyor...
+              </p>
             </motion.div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <AnimatePresence mode="wait">
+              {renderStep()}
+            </AnimatePresence>
 
             <div className="flex justify-center space-x-2 mb-8">
               {[0, 1, 2].map((step) => (
@@ -467,12 +552,6 @@ export default function Register() {
                 />
               ))}
             </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <AnimatePresence mode="wait">
-              {renderStep()}
-            </AnimatePresence>
 
             <div className="flex justify-between space-x-4">
               {currentStep > 0 && (
@@ -487,13 +566,16 @@ export default function Register() {
               )}
               
               <Button
-                type={currentStep === 2 ? "submit" : "button"}
-                onClick={currentStep < 2 ? nextStep : undefined}
-                className="w-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500"
+                type="button"
+                onClick={currentStep < 2 ? nextStep : handleFinalSubmit}
+                className="w-full bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 hover:from-purple-500 hover:via-pink-600 hover:to-blue-600 text-white font-medium"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    İşlem Yapılıyor...
+                  </>
                 ) : currentStep === 2 ? (
                   <>
                     <UserPlus className="w-4 h-4 mr-2" />

@@ -17,6 +17,7 @@ export function ArtworkCard({ artwork }: ArtworkCardProps) {
           <img
             src={artwork.image_url}
             alt={artwork.title}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
           />
         </div>

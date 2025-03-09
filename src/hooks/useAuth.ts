@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 
 export interface User {
   id: string;
@@ -14,45 +15,84 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Burada gerçek kimlik doğrulama mantığınızı uygulayın
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      // Token'ı doğrula ve kullanıcı bilgilerini al
-      setUser({
-        id: '1',
-        email: 'user@example.com',
-        name: 'Test User',
-        role: 'user'
-      });
-    }
-    setLoading(false);
+    // Supabase ile oturum kontrolü
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || 'Kullanıcı',
+            role: 'user'
+          });
+        }
+      } catch (error) {
+        console.error('Oturum kontrolü hatası:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
+
+    // Oturum değişikliklerini dinle
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || 'Kullanıcı',
+            role: 'user'
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      // Burada gerçek login mantığınızı uygulayın
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
 
-      if (!response.ok) throw new Error('Login failed');
+      if (error) throw error;
 
-      const data = await response.json();
-      localStorage.setItem('auth_token', data.token);
-      setUser(data.user);
-      return true;
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email || '',
+          name: data.user.user_metadata?.name || 'Kullanıcı',
+          role: 'user'
+        });
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error('Login error:', error);
       return false;
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('auth_token');
-    setUser(null);
-    navigate('/login');
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      // Çıkış sonrası doğru yönlendirme
+      navigate('/auth/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return { user, loading, login, logout };
