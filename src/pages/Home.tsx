@@ -220,7 +220,7 @@ const ArtModulesGrid = memo(() => {
         <LazyImage 
           src="/images/art-background.jpg" 
           alt="Art Background" 
-          role="art-modules"
+          role="gallery"
           priority={true}
           className="w-full h-full"
           objectFit="cover"

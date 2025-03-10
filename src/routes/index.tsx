@@ -4,7 +4,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 // Lazy loaded components
 const Home = lazy(() => import('@/pages/Home'));
-const Chat = lazy(() => import('@/pages/Chat'));
+const Chat = lazy(() => import('@/pages/chat/Chat'));
 const Gallery = lazy(() => import('@/pages/Gallery'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const ImageGeneration = lazy(() => import('@/pages/generate/image'));
