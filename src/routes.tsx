@@ -10,6 +10,8 @@ import About from '@/pages/About';
 import Privacy from '@/pages/Privacy';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
+import FAQ from '@/pages/faq';
+import Contact from '@/pages/contact';
 
 // Lazy loaded components
 const Gallery = lazy(() => import('@/pages/Gallery'));
@@ -58,6 +60,8 @@ export function AppRoutes() {
         <Route path="/auth/admin" element={!user ? <AdminLogin /> : <Navigate to="/" replace />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         

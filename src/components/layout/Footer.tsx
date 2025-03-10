@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Youtube, Palette, Sparkles, Heart, ArrowRight, Brush, Book, Compass } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, Palette, Sparkles, Heart, ArrowRight, Brush, Brain, Compass } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const footerLinks = {
@@ -7,16 +7,16 @@ const footerLinks = {
     { name: 'Hakkımızda', href: '/about' },
     { name: 'Ekibimiz', href: '/team' },
     { name: 'İletişim', href: '/contact' },
-    { name: 'Basın & Medya', href: '/press' },
     { name: 'SSS', href: '/faq' },
     { name: 'Gizlilik Politikası', href: '/privacy' },
   ],
-  education: [
-    { name: 'Çizim Teknikleri', href: '/education/drawing' },
-    { name: 'Resim Sanatı', href: '/education/painting' },
-    { name: 'Dijital Sanat', href: '/education/digital' },
-    { name: 'Heykel', href: '/education/sculpture' },
-    { name: 'Fotoğraf', href: '/education/photography' },
+  ai: [
+    { name: 'AI Chat Asistanı', href: '/chat' },
+    { name: 'Resim Oluşturma', href: '/generate/image' },
+    { name: 'Video Oluşturma', href: '/generate/video' },
+    { name: 'Ses Asistanı', href: '/generate/audio' },
+    { name: 'Müzik Yapay Zekası', href: '/ai-music' },
+    { name: 'Senaryo Asistanı', href: '/generate/script' }
   ],
   explore: [
     { name: 'Sanatçılar', href: '/artists' },
@@ -35,7 +35,7 @@ const footerLinks = {
 
 const categoryIcons = {
   about: { icon: Brush, color: 'from-pink-500 to-rose-500', label: 'Hakkımızda' },
-  education: { icon: Book, color: 'from-purple-500 to-indigo-500', label: 'Eğitim' },
+  ai: { icon: Brain, color: 'from-purple-500 to-indigo-500', label: 'Yapay Zeka' },
   explore: { icon: Compass, color: 'from-cyan-500 to-blue-500', label: 'Keşfet' },
 };
 

@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_OPENAI_API_KEY: string
   readonly VITE_ELEVENLABS_API_KEY: string
   readonly VITE_REPLICATE_API_KEY: string
 }

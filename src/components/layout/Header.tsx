@@ -53,7 +53,7 @@ export function Header() {
   const navItems = [
     { name: 'Ana Sayfa', path: '/', icon: Sparkles },
     { name: 'Galeri', path: '/gallery', icon: Palette },
-    { name: 'Arama', path: '/search', icon: Search },
+    { name: 'Arama', path: '/search', icon: Search }
   ];
 
   return (
