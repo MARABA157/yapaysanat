@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Crown, Star, Sparkles } from 'lucide-react';
+import { Check, Crown, Star, Sparkles, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getCurrentUser, isUserPremium } from '@/lib/auth';
+import { toast } from 'sonner';
 
 interface PremiumFeature {
   title: string;
@@ -32,7 +36,15 @@ const premiumFeatures: PremiumFeature[] = [
 export default function Premium() {
   const [user, setUser] = useState<any>(null);
   const [isPremium, setIsPremium] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardNumber: '',
+    expireMonth: '',
+    expireYear: '',
+    cvc: '',
+    name: ''
+  });
 
   useEffect(() => {
     async function checkUserStatus() {
@@ -51,10 +63,33 @@ export default function Premium() {
     checkUserStatus();
   }, []);
 
+  const handlePaymentSubmit = async () => {
+    // Geçici olarak devre dışı
+    toast.info('Ödeme sistemi yakında aktif olacak!');
+    setShowPaymentDialog(false);
+  };
+
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = matches && matches[0] || '';
+    const parts = [];
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+
+    if (parts.length) {
+      return parts.join(' ');
+    } else {
+      return value;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
       </div>
     );
   }
@@ -110,12 +145,15 @@ export default function Premium() {
             <div className="text-center">
               {user ? (
                 isPremium ? (
-                  <Button disabled className="w-full">
-                    <Crown className="w-4 h-4 mr-2" />
+                  <Button className="w-full bg-green-500 hover:bg-green-600 cursor-default">
+                    <Check className="w-4 h-4 mr-2" />
                     Aktif Premium
                   </Button>
                 ) : (
-                  <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                    onClick={() => setShowPaymentDialog(true)}
+                  >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Hemen Başla
                   </Button>
@@ -166,7 +204,10 @@ export default function Premium() {
             </ul>
 
             <div className="text-center">
-              <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90">
+              <Button 
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                onClick={() => setShowPaymentDialog(true)}
+              >
                 <Crown className="w-4 h-4 mr-2" />
                 Pro'ya Yükselt
               </Button>
@@ -211,6 +252,88 @@ export default function Premium() {
           </Card>
         </motion.div>
       </div>
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Premium Üyelik - Ödeme</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Kart Üzerindeki İsim</Label>
+              <Input
+                id="name"
+                value={paymentInfo.name}
+                onChange={(e) => setPaymentInfo({ ...paymentInfo, name: e.target.value })}
+                placeholder="Ad Soyad"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="cardNumber">Kart Numarası</Label>
+              <Input
+                id="cardNumber"
+                value={paymentInfo.cardNumber}
+                onChange={(e) => setPaymentInfo({ ...paymentInfo, cardNumber: formatCardNumber(e.target.value) })}
+                placeholder="1234 5678 9012 3456"
+                maxLength={19}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="expireMonth">Ay</Label>
+                <Input
+                  id="expireMonth"
+                  value={paymentInfo.expireMonth}
+                  onChange={(e) => setPaymentInfo({ ...paymentInfo, expireMonth: e.target.value })}
+                  placeholder="MM"
+                  maxLength={2}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="expireYear">Yıl</Label>
+                <Input
+                  id="expireYear"
+                  value={paymentInfo.expireYear}
+                  onChange={(e) => setPaymentInfo({ ...paymentInfo, expireYear: e.target.value })}
+                  placeholder="YY"
+                  maxLength={2}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cvc">CVC</Label>
+                <Input
+                  id="cvc"
+                  value={paymentInfo.cvc}
+                  onChange={(e) => setPaymentInfo({ ...paymentInfo, cvc: e.target.value })}
+                  placeholder="123"
+                  maxLength={3}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-4">
+            <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>
+              İptal
+            </Button>
+            <Button 
+              onClick={handlePaymentSubmit} 
+              disabled={loading}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  İşleniyor...
+                </div>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Ödeme Yap
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
