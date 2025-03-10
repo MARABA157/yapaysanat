@@ -48,7 +48,7 @@ export default function ProfileActions() {
       </button>
 
       <button 
-        onClick={() => navigate('/artist/123')} 
+        onClick={() => navigate('/artist/123')}
         className="flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 p-4 rounded-lg hover:bg-gray-200 transition duration-200"
       >
         <Users size={20} />
