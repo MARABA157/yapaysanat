@@ -58,6 +58,7 @@ const ArtModuleCard = memo(({ module, index }: { module: any, index: number }) =
             <LazyImage
               src={module.bgImage}
               alt={module.title}
+              role="gallery"
               priority={index < 4} // İlk 4 modül için öncelikli yükleme
               className="w-full h-full opacity-60 group-hover:opacity-40 transition-opacity duration-300"
               objectFit="cover"
@@ -104,7 +105,7 @@ const HeroSection = memo(() => (
       <LazyImage 
         src="/images/backgrounds/hero-bg.jpg" 
         alt="Art Gallery" 
-        role="hero"
+        role="background"
         priority={true}
         className="w-full h-full"
         objectFit="cover"

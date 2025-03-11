@@ -7,10 +7,11 @@ import { Upload, Play, Pause, Scissors, Wand2, RotateCcw, Download, Share2, Volu
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { Progress } from '@/components/ui/progress';
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
 
 // FFmpeg yükleme durumu
-const ffmpeg = createFFmpeg();
+const ffmpeg = new FFmpeg();
 let ffmpegLoaded = false;
 
 // Özel stil tanımı
@@ -61,7 +62,7 @@ export default function VideoEditor() {
         // FFmpeg yükleme
         await ffmpeg.load();
         ffmpegLoaded = true;
-        toast.success('Video işleme motoru yüklendi');
+        toast.info('Video işleme motoru yüklendi');
       } catch (error) {
         console.error('FFmpeg yüklenemedi:', error);
         toast.error('Video işleme motoru yüklenemedi');
@@ -124,8 +125,7 @@ export default function VideoEditor() {
 
   const applyBlur = () => {
     setIsProcessing(true);
-    toast({
-      title: "Bulanıklaştırma uygulanıyor",
+    toast.info("Bulanıklaştırma uygulanıyor", {
       description: "Video bulanıklaştırılıyor...",
     });
 
@@ -137,8 +137,7 @@ export default function VideoEditor() {
       }
 
       setIsProcessing(false);
-      toast({
-        title: "İşlem tamamlandı",
+      toast.success("İşlem tamamlandı", {
         description: "Bulanıklaştırma efekti uygulandı.",
       });
     }, 500);
@@ -146,8 +145,7 @@ export default function VideoEditor() {
 
   const applyBrightness = () => {
     setIsProcessing(true);
-    toast({
-      title: "Parlaklık ayarlanıyor",
+    toast.info("Parlaklık ayarlanıyor", {
       description: "Video parlaklığı artırılıyor...",
     });
 
@@ -159,8 +157,7 @@ export default function VideoEditor() {
       }
 
       setIsProcessing(false);
-      toast({
-        title: "İşlem tamamlandı",
+      toast.success("İşlem tamamlandı", {
         description: "Parlaklık efekti uygulandı.",
       });
     }, 500);
@@ -168,8 +165,7 @@ export default function VideoEditor() {
 
   const applyContrast = () => {
     setIsProcessing(true);
-    toast({
-      title: "Kontrast ayarlanıyor",
+    toast.info("Kontrast ayarlanıyor", {
       description: "Video kontrastı artırılıyor...",
     });
 
@@ -181,8 +177,7 @@ export default function VideoEditor() {
       }
 
       setIsProcessing(false);
-      toast({
-        title: "İşlem tamamlandı",
+      toast.success("İşlem tamamlandı", {
         description: "Kontrast efekti uygulandı.",
       });
     }, 500);
@@ -190,8 +185,7 @@ export default function VideoEditor() {
 
   const applyGrayscale = () => {
     setIsProcessing(true);
-    toast({
-      title: "Siyah-beyaz efekti uygulanıyor",
+    toast.info("Siyah-beyaz efekti uygulanıyor", {
       description: "Video siyah-beyaz yapılıyor...",
     });
 
@@ -203,8 +197,7 @@ export default function VideoEditor() {
       }
 
       setIsProcessing(false);
-      toast({
-        title: "İşlem tamamlandı",
+      toast.success("İşlem tamamlandı", {
         description: "Siyah-beyaz efekti uygulandı.",
       });
     }, 500);
@@ -212,8 +205,7 @@ export default function VideoEditor() {
 
   const applySpeedChange = (speed: number) => {
     setIsProcessing(true);
-    toast({
-      title: "Hız değiştiriliyor",
+    toast.info("Hız değiştiriliyor", {
       description: `Video hızı ${speed}x yapılıyor...`,
     });
 
@@ -224,8 +216,7 @@ export default function VideoEditor() {
       }
 
       setIsProcessing(false);
-      toast({
-        title: "İşlem tamamlandı",
+      toast.success("İşlem tamamlandı", {
         description: `Video hızı ${speed}x olarak ayarlandı.`,
       });
     }, 500);
@@ -233,8 +224,7 @@ export default function VideoEditor() {
 
   const trimVideo = () => {
     setIsProcessing(true);
-    toast({
-      title: "Video kırpılıyor",
+    toast.info("Video kırpılıyor", {
       description: "Belirlenen aralık kırpılıyor...",
     });
 
@@ -244,8 +234,7 @@ export default function VideoEditor() {
       }
 
       setIsProcessing(false);
-      toast({
-        title: "İşlem tamamlandı",
+      toast.success("İşlem tamamlandı", {
         description: `Video ${startTime.toFixed(1)} - ${endTime.toFixed(1)} saniye aralığına kırpıldı.`,
       });
     }, 500);
