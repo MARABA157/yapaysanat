@@ -155,6 +155,36 @@ class ImagePerformanceMonitor {
     }
   }
 
+  public recordImageLoadStart(src: string): void {
+    if (!this.enabled || !src) return;
+    
+    const startTime = performance.now();
+    this.imageStats.set(src, {
+      src,
+      loadTime: 0,
+      status: 'success',
+      timestamp: startTime,
+      retries: 0,
+      cached: this.preloadCache.has(src)
+    });
+  }
+
+  public recordImageLoadComplete(src: string): void {
+    if (!this.enabled || !src) return;
+    
+    const stat = this.imageStats.get(src);
+    if (stat) {
+      const loadTime = performance.now() - stat.timestamp;
+      stat.loadTime = loadTime;
+      this.imageLoadTimes.push(loadTime);
+      
+      if (loadTime > this.slowThreshold) {
+        this.problematicImages.add(src);
+        console.warn(`Yavaş yüklenen resim: ${src} (${Math.round(loadTime)}ms)`);
+      }
+    }
+  }
+
   public getStats(): any {
     return {
       totalImages: this.imageStats.size,

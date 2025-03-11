@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { 
   supportsWebp, 
@@ -424,3 +424,5 @@ function isElementNearViewport(el: HTMLElement | null, margin: number = 300): bo
     rect.right <= (window.innerWidth || document.documentElement.clientWidth) + rect.width + margin
   );
 }
+
+export default LazyImage;

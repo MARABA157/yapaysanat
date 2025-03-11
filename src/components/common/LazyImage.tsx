@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { recordImageLoadStart, recordImageLoadComplete } from '../../lib/image-performance';
+import imagePerformanceMonitor from '../../lib/image-performance';
 
 interface LazyImageProps {
   src: string;
@@ -38,7 +38,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
     const optimizedSrc = getOptimizedSrc();
 
     // Yükleme başlangıcını kaydet
-    recordImageLoadStart(optimizedSrc);
+    imagePerformanceMonitor.recordImageLoadStart(optimizedSrc);
 
     // Öncelikli resimler veya hero/banner resimleri için hemen yükle
     if (priority || role === 'hero' || role === 'banner') {
@@ -64,7 +64,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
   const handleLoad = () => {
     setIsLoaded(true);
     if (imgRef.current?.src) {
-      recordImageLoadComplete(imgRef.current.src);
+      imagePerformanceMonitor.recordImageLoadComplete(imgRef.current.src);
     }
   };
 

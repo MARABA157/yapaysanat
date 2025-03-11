@@ -1,1 +1,2 @@
-export { default as LazyImage } from './lazy-image';
+import LazyImage from './lazy-image';
+export { LazyImage };
