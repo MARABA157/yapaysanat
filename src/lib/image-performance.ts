@@ -170,6 +170,32 @@ class ImagePerformanceMonitor {
     const sum = this.imageLoadTimes.reduce((a, b) => a + b, 0);
     return Math.round(sum / this.imageLoadTimes.length);
   }
+
+  public logStats(): void {
+    const stats = this.getStats();
+    
+    console.group('Resim Performans İstatistikleri');
+    console.log(`Toplam Resim: ${stats.totalImages}`);
+    console.log(`Ortalama Yükleme Süresi: ${stats.averageLoadTime}ms`);
+    
+    if (stats.problematicImages.length > 0) {
+      console.group('Sorunlu Resimler');
+      stats.problematicImages.forEach((src: string, index: number) => {
+        console.log(`${index + 1}. ${src}`);
+      });
+      console.groupEnd();
+    }
+    
+    if (stats.cachedImages.length > 0) {
+      console.group('Önbellekteki Resimler');
+      stats.cachedImages.forEach((src: string, index: number) => {
+        console.log(`${index + 1}. ${src}`);
+      });
+      console.groupEnd();
+    }
+    
+    console.groupEnd();
+  }
 }
 
 // Singleton instance
