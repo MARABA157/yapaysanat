@@ -307,8 +307,8 @@ export default function VideoEditor() {
       const clipDuration = endTimeSeconds - startTimeSeconds;
       
       // FFmpeg komutunu çalıştır
-      ffmpeg.on('progress', ({ ratio }) => {
-        setProgress(Math.round(ratio * 100));
+      ffmpeg.on('progress', (progress) => {
+        setProgress(Math.round(progress.progress * 100));
       });
       
       await ffmpeg.exec([
