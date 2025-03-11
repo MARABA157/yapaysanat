@@ -9,7 +9,7 @@ const mockArtworks: Artwork[] = [
   {
     id: "1",
     title: "Yağlı Boya Portre",
-    image_url: "https://images.pexels.com/photos/1918290/pexels-photo-1918290.jpeg",
+    image_url: "/images/pexels-1918290.jpeg",
     user_id: "1",
     artist_id: "1",
     artist: {
@@ -22,7 +22,7 @@ const mockArtworks: Artwork[] = [
   {
     id: "2",
     title: "Modern Soyut",
-    image_url: "https://images.pexels.com/photos/1585325/pexels-photo-1585325.jpeg",
+    image_url: "/images/pexels-1585325.jpeg",
     user_id: "2",
     artist_id: "2",
     artist: {
@@ -35,7 +35,7 @@ const mockArtworks: Artwork[] = [
   {
     id: "3",
     title: "Şehir Manzarası",
-    image_url: "https://images.pexels.com/photos/3844788/pexels-photo-3844788.jpeg",
+    image_url: "/images/pexels-3844788.jpeg",
     user_id: "3",
     artist_id: "3",
     artist: {
@@ -48,7 +48,7 @@ const mockArtworks: Artwork[] = [
   {
     id: "4",
     title: "Natürmort",
-    image_url: "https://images.pexels.com/photos/1939485/pexels-photo-1939485.jpeg",
+    image_url: "/images/pexels-1939485.jpeg",
     user_id: "4",
     artist_id: "4",
     artist: {
@@ -61,7 +61,7 @@ const mockArtworks: Artwork[] = [
   {
     id: "5",
     title: "Deniz Manzarası",
-    image_url: "https://images.pexels.com/photos/1931379/pexels-photo-1931379.jpeg",
+    image_url: "/images/pexels-1931379.jpeg",
     user_id: "5",
     artist_id: "5",
     artist: {

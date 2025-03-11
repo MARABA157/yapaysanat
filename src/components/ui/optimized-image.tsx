@@ -79,7 +79,6 @@ export function OptimizedImage({
   
   // Stil oluşturma
   const imageStyle: React.CSSProperties = {
-    objectFit,
     width: width ? `${width}px` : '100%',
     height: height ? `${height}px` : 'auto',
     transition: 'opacity 0.3s ease-in-out',
@@ -124,7 +123,7 @@ export function OptimizedImage({
           onLoad={handleLoad}
           onError={handleError}
           loading={priority ? 'eager' : 'lazy'}
-          wrapperClassName="w-full h-full"
+          wrapperClassName={`w-full h-full object-${objectFit}`}
         />
       </picture>
     </div>

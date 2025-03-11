@@ -7,17 +7,17 @@ const cities = [
   {
     name: "İstanbul",
     description: "Kültürlerin Buluşma Noktası",
-    image: "https://images.pexels.com/photos/3551662/pexels-photo-3551662.jpeg"
+    image: "/images/pexels-3551662.jpeg"
   },
   {
     name: "Paris",
     description: "Sanatın Başkenti",
-    image: "https://images.pexels.com/photos/2082103/pexels-photo-2082103.jpeg"
+    image: "/images/pexels-2082103.jpeg"
   },
   {
     name: "New York",
     description: "Modern Sanatın Merkezi",
-    image: "https://images.pexels.com/photos/2224861/pexels-photo-2224861.jpeg"
+    image: "/images/pexels-2224861.jpeg"
   }
 ];
 
@@ -53,7 +53,7 @@ export default function Hero() {
             loading="eager"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = 'https://images.pexels.com/photos/20967/pexels-photo.jpg';
+              target.src = '/images/pexels-pexels-photo.jpg';
             }}
           />
           <div className="absolute bottom-8 right-8 text-white/60 text-lg">
