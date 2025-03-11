@@ -4,8 +4,7 @@ import {
   supportsWebp, 
   getWebpUrl, 
   loadWebpUrlMapping,
-  checkConnectionQuality,
-  getImageLoadingPriority
+  getConnectionQuality
 } from '@/lib/utils';
 import imagePerformanceMonitor from '@/lib/image-performance';
 import networkMonitor from '@/lib/network-monitor';
