@@ -3,9 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Play, Pause, Scissors, Wand2, RotateCcw, Download, Share2 } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { Upload, Play, Pause, Scissors, Wand2, RotateCcw, Download, Share2, Volume2, VolumeX, Music } from 'lucide-react';
+import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/toaster';
+import { Progress } from '@/components/ui/progress';
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+
+// FFmpeg yükleme durumu
+const ffmpeg = createFFmpeg({ 
+  log: true,
+  corePath: 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/ffmpeg-core.js'
+});
 
 // Özel stil tanımı
 const pageStyle: React.CSSProperties = {
@@ -38,9 +46,38 @@ export default function VideoEditor() {
   const [duration, setDuration] = useState<number>(0);
   const [isProcessed, setIsProcessed] = useState(false);
   const [videoName, setVideoName] = useState<string>('');
+  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+  const [ffmpegLoading, setFfmpegLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const videoFileRef = useRef<File | null>(null);
+
+  // FFmpeg'i yükle
+  const loadFFmpeg = async () => {
+    if (!ffmpeg.isLoaded()) {
+      setFfmpegLoading(true);
+      try {
+        await ffmpeg.load();
+        setFfmpegLoaded(true);
+        toast.success('Video işleme motoru yüklendi');
+      } catch (error) {
+        console.error('FFmpeg yüklenemedi:', error);
+        toast.error('Video işleme motoru yüklenemedi');
+      } finally {
+        setFfmpegLoading(false);
+      }
+    } else {
+      setFfmpegLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    loadFFmpeg();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,6 +85,7 @@ export default function VideoEditor() {
       const url = URL.createObjectURL(file);
       setSelectedVideo(url);
       setVideoName(file.name);
+      videoFileRef.current = file;
       resetFilters();
       setIsProcessed(false);
     }
@@ -215,21 +253,110 @@ export default function VideoEditor() {
     }, 500);
   };
 
-  const processVideo = () => {
-    setIsProcessing(true);
-    toast({
-      title: "Video işleniyor",
-      description: "Tüm efektler uygulanıyor...",
-    });
+  const handleVolumeChange = (value: number) => {
+    setVolume(value);
+    if (videoRef.current) {
+      videoRef.current.volume = value;
+    }
+    if (value === 0) {
+      setIsMuted(true);
+    } else {
+      setIsMuted(false);
+    }
+  };
 
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsProcessed(true);
-      toast({
-        title: "İşlem tamamlandı",
-        description: "Video başarıyla işlendi. Şu anda önizleme modundasınız.",
+  const toggleMute = () => {
+    if (videoRef.current) {
+      if (isMuted) {
+        videoRef.current.volume = volume;
+        setIsMuted(false);
+      } else {
+        videoRef.current.volume = 0;
+        setIsMuted(true);
+      }
+    }
+  };
+
+  const processVideo = async () => {
+    if (!selectedVideo || !videoFileRef.current || !ffmpegLoaded) {
+      toast.error('Video işlenemedi. Lütfen bir video yükleyin ve tekrar deneyin.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setProgress(0);
+    toast.info('Video işleniyor, lütfen bekleyin...');
+
+    try {
+      // Video dosyasını FFmpeg'e yükle
+      ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFileRef.current));
+
+      // Filtre komutlarını oluştur
+      let filterCommands = [];
+      let outputOptions = ['-c:a copy']; // Ses kanalını kopyala
+
+      // Hız değişikliği
+      if (playbackRate !== 1) {
+        filterCommands.push(`setpts=${1/playbackRate}*PTS`);
+        outputOptions.push(`-filter:a "atempo=${playbackRate}"`);
+      }
+
+      // Görsel filtreler
+      if (videoFilters.includes('blur')) {
+        filterCommands.push('boxblur=5:1');
+      }
+      if (videoFilters.includes('brightness')) {
+        filterCommands.push('eq=brightness=0.3');
+      }
+      if (videoFilters.includes('contrast')) {
+        filterCommands.push('eq=contrast=1.5');
+      }
+      if (videoFilters.includes('grayscale')) {
+        filterCommands.push('hue=s=0');
+      }
+
+      // Filtreleri birleştir
+      let filterComplex = filterCommands.length > 0 ? `-vf "${filterCommands.join(',')}"` : '';
+      
+      // Kırpma işlemi
+      const trimCommand = `-ss ${startTime} -to ${endTime}`;
+
+      // İlerleme durumunu izle
+      ffmpeg.setProgress(({ ratio }) => {
+        setProgress(Math.round(ratio * 100));
       });
-    }, 1000);
+
+      // FFmpeg komutunu çalıştır
+      await ffmpeg.run(
+        '-i', 'input.mp4',
+        ...trimCommand.split(' '),
+        ...filterComplex.split(' ').filter(Boolean),
+        ...outputOptions.join(' ').split(' ').filter(Boolean),
+        'output.mp4'
+      );
+
+      // İşlenmiş videoyu al
+      const data = ffmpeg.FS('readFile', 'output.mp4');
+      
+      // Blob oluştur ve URL'ye dönüştür
+      const blob = new Blob([data.buffer], { type: 'video/mp4' });
+      const processedVideoUrl = URL.createObjectURL(blob);
+      
+      // Eski URL'yi temizle ve yeni URL'yi ayarla
+      if (selectedVideo) {
+        URL.revokeObjectURL(selectedVideo);
+      }
+      
+      setSelectedVideo(processedVideoUrl);
+      setIsProcessed(true);
+      toast.success('Video başarıyla işlendi!');
+    } catch (error) {
+      console.error('Video işleme hatası:', error);
+      toast.error('Video işlenirken bir hata oluştu.');
+    } finally {
+      setIsProcessing(false);
+      setProgress(0);
+    }
   };
 
   const downloadVideo = () => {
@@ -242,10 +369,7 @@ export default function VideoEditor() {
     a.click();
     document.body.removeChild(a);
 
-    toast({
-      title: "Video indiriliyor",
-      description: "İşlenen video indiriliyor...",
-    });
+    toast.success('Video indiriliyor...');
   };
 
   const shareVideo = () => {
@@ -256,22 +380,13 @@ export default function VideoEditor() {
         url: window.location.href,
       })
       .then(() => {
-        toast({
-          title: "Paylaşım başarılı",
-          description: "Video bağlantısı paylaşıldı.",
-        });
+        toast.success('Video bağlantısı paylaşıldı.');
       })
       .catch((error) => {
-        toast({
-          title: "Paylaşım hatası",
-          description: "Video paylaşılırken bir hata oluştu.",
-        });
+        toast.error('Video paylaşılırken bir hata oluştu.');
       });
     } else {
-      toast({
-        title: "Paylaşım desteklenmiyor",
-        description: "Tarayıcınız paylaşım özelliğini desteklemiyor.",
-      });
+      toast.error('Tarayıcınız paylaşım özelliğini desteklemiyor.');
     }
   };
 
@@ -332,6 +447,11 @@ export default function VideoEditor() {
                     Sıfırla
                   </Button>
 
+                  <Button variant="outline" onClick={toggleMute} disabled={isProcessing}>
+                    {isMuted ? <VolumeX size={16} className="mr-2" /> : <Volume2 size={16} className="mr-2" />}
+                    {isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
+                  </Button>
+
                   {isProcessed && (
                     <>
                       <Button variant="outline" onClick={downloadVideo} disabled={isProcessing}>
@@ -346,6 +466,13 @@ export default function VideoEditor() {
                   )}
                 </div>
               )}
+
+              {isProcessing && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-300 mb-2">İşleniyor: %{progress}</p>
+                  <Progress value={progress} className="h-2" />
+                </div>
+              )}
             </Card>
           </div>
 
@@ -353,10 +480,11 @@ export default function VideoEditor() {
           <div>
             <Card className="p-4 bg-black/50 backdrop-blur-sm border-gray-700">
               <Tabs defaultValue="effects">
-                <TabsList className="grid grid-cols-3 mb-4">
+                <TabsList className="grid grid-cols-4 mb-4">
                   <TabsTrigger value="effects">Efektler</TabsTrigger>
                   <TabsTrigger value="speed">Hız</TabsTrigger>
                   <TabsTrigger value="trim">Kırpma</TabsTrigger>
+                  <TabsTrigger value="audio">Ses</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="effects">
@@ -471,17 +599,53 @@ export default function VideoEditor() {
                     </Button>
                   </div>
                 </TabsContent>
+
+                <TabsContent value="audio">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 text-gray-200">Ses Seviyesi: {Math.round(volume * 100)}%</p>
+                      <Slider 
+                        disabled={!selectedVideo || isProcessing} 
+                        value={[volume]} 
+                        max={1} 
+                        step={0.01}
+                        onValueChange={(value) => handleVolumeChange(value[0])}
+                      />
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      disabled={!selectedVideo || isProcessing}
+                      onClick={toggleMute}
+                    >
+                      {isMuted ? <VolumeX className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+                      {isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
+                    </Button>
+                  </div>
+                </TabsContent>
               </Tabs>
 
               <div className="mt-4">
                 <Button 
                   className="w-full" 
-                  disabled={!selectedVideo || isProcessing}
+                  disabled={!selectedVideo || isProcessing || !ffmpegLoaded}
                   onClick={processVideo}
                 >
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Videoyu İşle
+                  {isProcessing ? (
+                    <>
+                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                      İşleniyor...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="mr-2 h-4 w-4" />
+                      Videoyu İşle
+                    </>
+                  )}
                 </Button>
+                {ffmpegLoading && (
+                  <p className="text-xs text-gray-400 mt-2 text-center">Video işleme motoru yükleniyor...</p>
+                )}
               </div>
             </Card>
           </div>

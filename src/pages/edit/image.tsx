@@ -98,9 +98,31 @@ export default function ImageEditor() {
       data[i] = Math.min(255, Math.max(0, factor * (data[i] - 128) + 128));
       data[i + 1] = Math.min(255, Math.max(0, factor * (data[i + 1] - 128) + 128));
       data[i + 2] = Math.min(255, Math.max(0, factor * (data[i + 2] - 128) + 128));
+      
+      // Doygunluk (Saturation)
+      const saturation = imageState.saturation * 2; // Çarpan olarak kullan
+      if (saturation !== 0) {
+        const gray = 0.2989 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]; // Gri ton hesaplama
+        data[i] = Math.min(255, Math.max(0, gray + saturation * (data[i] - gray)));
+        data[i + 1] = Math.min(255, Math.max(0, gray + saturation * (data[i + 1] - gray)));
+        data[i + 2] = Math.min(255, Math.max(0, gray + saturation * (data[i + 2] - gray)));
+      }
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    // Bulanıklık (Blur) efekti
+    if (imageState.blur > 0) {
+      // Bulanıklık efekti için canvas'a filtre uygula
+      ctx.filter = `blur(${imageState.blur * 10}px)`;
+      ctx.putImageData(imageData, 0, 0);
+      
+      // Bulanıklık için tekrar çiz
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+    } else {
+      ctx.putImageData(imageData, 0, 0);
+    }
+    
     ctx.restore();
   };
 
@@ -261,6 +283,26 @@ export default function ImageEditor() {
                         value={[imageState.contrast]}
                         onValueChange={([value]) => setImageState(prev => ({ ...prev, contrast: value }))}
                         min={-1}
+                        max={1}
+                        step={0.1}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Doygunluk</label>
+                      <Slider
+                        value={[imageState.saturation]}
+                        onValueChange={([value]) => setImageState(prev => ({ ...prev, saturation: value }))}
+                        min={-1}
+                        max={1}
+                        step={0.1}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Bulanıklık</label>
+                      <Slider
+                        value={[imageState.blur]}
+                        onValueChange={([value]) => setImageState(prev => ({ ...prev, blur: value }))}
+                        min={0}
                         max={1}
                         step={0.1}
                       />

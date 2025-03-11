@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, memo } from 'react';
-import { ImageService } from '@/lib/image';
 import { cn } from '@/lib/utils';
+import imageService from '@/services/ImageService';
 
 // Görüntü önbelleği
 const imageCache = new Map<string, boolean>();
@@ -49,19 +49,45 @@ const queueImagePreload = (src: string) => {
   processPreloadQueue();
 };
 
-interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+// AVIF formatını destekleyip desteklemediğini kontrol et
+const checkAvifSupport = async (): Promise<boolean> => {
+  if (typeof window === 'undefined') return false;
+  
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+  });
+};
+
+// WebP formatını destekleyip desteklemediğini kontrol et
+const checkWebpSupport = async (): Promise<boolean> => {
+  if (typeof window === 'undefined') return false;
+  
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = 'data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
+  });
+};
+
+export interface LazyImageProps {
   src: string;
   alt: string;
   width?: number;
   height?: number;
-  quality?: number;
-  fallbackFormat?: 'jpeg' | 'png';
-  role?: 'hero' | 'thumbnail' | 'gallery' | 'full';
-  placeholderColor?: string;
-  blurDataURL?: string;
-  priority?: boolean;
+  className?: string;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-  objectPosition?: string;
+  priority?: boolean;
+  placeholder?: string;
+  blurDataURL?: string;
+  quality?: number;
+  role?: 'banner' | 'thumbnail' | 'gallery' | 'avatar' | 'icon' | 'background';
+  sizes?: string;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
 const LazyImage = memo(({
@@ -69,155 +95,182 @@ const LazyImage = memo(({
   alt,
   width,
   height,
-  quality = 80,
-  fallbackFormat = 'jpeg',
-  role = 'gallery',
-  placeholderColor = '#f3f4f6',
-  blurDataURL,
-  priority = false,
-  objectFit = 'cover',
-  objectPosition = 'center',
   className,
-  ...props
+  objectFit = 'cover',
+  priority = false,
+  placeholder = 'blur',
+  blurDataURL,
+  quality = 85,
+  role = 'thumbnail',
+  sizes,
+  onLoad,
+  onError
 }: LazyImageProps) => {
-  const [isLoaded, setIsLoaded] = useState(imageCache.has(src));
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [isWebPSupported, setIsWebPSupported] = useState(true);
-  const [isAVIFSupported, setIsAVIFSupported] = useState(false);
-  const [sizes, setSizes] = useState<string>('');
-
-  // Generate a simple blur hash placeholder if not provided
-  const placeholder = blurDataURL || `data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width || 100} ${height || 100}'%3E%3Crect width='100%25' height='100%25' fill='${placeholderColor.replace('#', '%23')}'/%3E%3C/svg%3E`;
-
+  const [supportsAvif, setSupportsAvif] = useState<boolean | null>(null);
+  const [supportsWebp, setSupportsWebp] = useState<boolean | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  
+  // Format desteğini kontrol et
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsWebPSupported(ImageService.isWebPSupported());
-      setIsAVIFSupported(ImageService.isAVIFSupported());
-      setSizes(ImageService.getSizesAttribute(role));
-    }
-  }, [role]);
-
-  // Öncelikli resimleri hemen yükle
+    const checkFormats = async () => {
+      const avifSupported = await checkAvifSupport();
+      const webpSupported = await checkWebpSupport();
+      setSupportsAvif(avifSupported);
+      setSupportsWebp(webpSupported);
+    };
+    
+    checkFormats();
+  }, []);
+  
+  // Optimize edilmiş kaynak URL'sini al
+  const getOptimizedSrc = () => {
+    return imageService.optimizeImage(src, {
+      format: supportsAvif ? 'avif' : supportsWebp ? 'webp' : 'jpeg',
+      quality,
+      width,
+      height
+    });
+  };
+  
+  // Öncelikli görüntüler için preload
   useEffect(() => {
-    if (priority && src && !imageCache.has(src)) {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        imageCache.set(src, true);
-        setIsLoaded(true);
-      };
-      img.onerror = () => {
-        setError(true);
+    if (priority && src) {
+      const optimizedSrc = getOptimizedSrc();
+      queueImagePreload(optimizedSrc);
+      
+      // Preload link ekle
+      const linkEl = document.createElement('link');
+      linkEl.rel = 'preload';
+      linkEl.as = 'image';
+      linkEl.href = optimizedSrc;
+      document.head.appendChild(linkEl);
+      
+      return () => {
+        document.head.removeChild(linkEl);
       };
     }
-  }, [priority, src]);
+  }, [priority, src, supportsAvif, supportsWebp]);
 
   useEffect(() => {
     let observer: IntersectionObserver;
-    let didCancel = false;
-
-    // If priority is true or already loaded, no need for intersection observer
-    if (priority || isLoaded) {
-      return;
-    }
-
-    // Otherwise use intersection observer for lazy loading
-    if (imageRef.current) {
-      if (IntersectionObserver) {
-        observer = new IntersectionObserver(
-          entries => {
-            entries.forEach(entry => {
-              if (
-                !didCancel &&
-                (entry.intersectionRatio > 0 || entry.isIntersecting)
-              ) {
-                // Görünür alana girdiğinde resmi yükle
-                if (imageRef.current) {
-                  if (imageRef.current.loading === 'lazy') {
-                    imageRef.current.loading = 'eager';
-                  }
-                  
-                  // Resmi önbelleğe ekle
-                  if (!imageCache.has(src)) {
-                    queueImagePreload(src);
-                  }
-                }
-                
-                observer.unobserve(imageRef.current!);
-              }
-            });
-          },
-          {
-            threshold: 0.01,
-            rootMargin: '200px', // Load images when they're 200px from viewport
+    
+    // Öncelikli olmayan görüntüler için IntersectionObserver kullan
+    if (!priority && typeof window !== 'undefined' && 'IntersectionObserver' in window && imgRef.current) {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && imgRef.current && !loaded) {
+            // Görüntü görünür olduğunda yükle
+            const optimizedSrc = getOptimizedSrc();
+            imgRef.current.src = optimizedSrc;
+            observer.unobserve(entry.target);
           }
-        );
-        observer.observe(imageRef.current);
-      }
+        });
+      }, {
+        rootMargin: '200px 0px', // Görüntü görünmeden 200px önce yüklemeye başla
+        threshold: 0.01
+      });
+      
+      observer.observe(imgRef.current);
+      observerRef.current = observer;
     }
-
+    
     return () => {
-      didCancel = true;
-      if (observer && observer.unobserve && imageRef.current) {
-        observer.unobserve(imageRef.current);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
-  }, [priority, isLoaded, src]);
-
-  const handleLoad = () => {
-    setIsLoaded(true);
-    // Görüntüyü önbelleğe ekle
-    imageCache.set(src, true);
+  }, [src, priority, loaded, supportsAvif, supportsWebp]);
+  
+  // Görüntü rolüne göre otomatik sizes özniteliği oluştur
+  const getSizes = () => {
+    if (sizes) return sizes;
+    
+    switch (role) {
+      case 'banner':
+        return '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px';
+      case 'thumbnail':
+        return '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px';
+      case 'icon':
+        return '32px';
+      case 'avatar':
+        return '150px';
+      case 'background':
+        return '100vw';
+      default:
+        return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px';
+    }
   };
 
+  const handleLoad = () => {
+    setLoaded(true);
+    if (onLoad) onLoad();
+  };
+  
   const handleError = () => {
     setError(true);
+    if (onError) onError();
   };
 
   return (
     <div 
       className={cn(
         "relative overflow-hidden",
-        !isLoaded && "bg-gray-200",
         className
       )}
-      style={{ 
-        width: width ? `${width}px` : '100%',
-        height: height ? `${height}px` : 'auto',
-        aspectRatio: width && height ? `${width}/${height}` : 'auto'
+      style={{
+        width: width ? `${width}px` : 'auto',
+        height: height ? `${height}px` : 'auto'
       }}
     >
+      {/* Placeholder veya bulanık efekt */}
+      {!loaded && !error && placeholder === 'blur' && (
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-pulse"
+          style={{ 
+            backgroundImage: `url(${blurDataURL || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"%3E%3Crect width="40" height="40" fill="%23f0f0f0"/%3E%3C/svg%3E'})`,
+            filter: 'blur(20px)',
+            transform: 'scale(1.2)'
+          }}
+          aria-hidden="true"
+        />
+      )}
+      
+      {/* Ana görüntü */}
       <img
-        ref={imageRef}
-        src={src}
+        ref={imgRef}
+        src={priority ? getOptimizedSrc() : blurDataURL || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"%3E%3Crect width="40" height="40" fill="%23f0f0f0"/%3E%3C/svg%3E'}
         alt={alt}
         width={width}
         height={height}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding={priority ? 'sync' : 'async'}
         onLoad={handleLoad}
         onError={handleError}
-        loading={priority ? "eager" : "lazy"}
-        decoding={priority ? "sync" : "async"}
-        style={{
-          objectFit,
-          objectPosition,
-          width: '100%',
-          height: '100%',
-          transition: 'opacity 0.2s ease-in-out',
-          opacity: isLoaded ? 1 : 0
-        }}
-        {...props}
+        className={cn(
+          "transition-opacity duration-500",
+          objectFit === 'cover' && "object-cover",
+          objectFit === 'contain' && "object-contain",
+          objectFit === 'fill' && "object-fill",
+          objectFit === 'none' && "object-none",
+          objectFit === 'scale-down' && "object-scale-down",
+          loaded ? "opacity-100" : "opacity-0",
+          error && "hidden"
+        )}
+        sizes={getSizes()}
       />
       
-      {/* Yükleme durumu gösterimi */}
-      {!isLoaded && !error && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-      )}
-      
-      {/* Hata durumu gösterimi */}
+      {/* Hata durumu */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <span className="text-sm text-gray-500">Resim yüklenemedi</span>
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>Görüntü yüklenemedi</span>
         </div>
       )}
     </div>
@@ -225,5 +278,4 @@ const LazyImage = memo(({
 });
 
 LazyImage.displayName = 'LazyImage';
-
 export default LazyImage;
