@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { Progress } from '@/components/ui/progress';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 // FFmpeg yükleme durumu
 const ffmpeg = new FFmpeg();
@@ -275,7 +275,7 @@ export default function VideoEditor() {
 
     try {
       // Video dosyasını FFmpeg'e yükle
-      ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFileRef.current));
+      await ffmpeg.writeFile('input.mp4', await fetchFile(videoFileRef.current));
 
       // Filtre komutlarını oluştur
       let filterCommands = [];
@@ -307,11 +307,11 @@ export default function VideoEditor() {
       const clipDuration = endTimeSeconds - startTimeSeconds;
       
       // FFmpeg komutunu çalıştır
-      ffmpeg.setProgress(({ ratio }) => {
+      ffmpeg.on('progress', ({ ratio }) => {
         setProgress(Math.round(ratio * 100));
       });
       
-      await ffmpeg.run(
+      await ffmpeg.exec([
         '-i', 'input.mp4',
         '-ss', `${startTimeSeconds}`,
         '-t', `${clipDuration}`,
@@ -322,13 +322,13 @@ export default function VideoEditor() {
         '-c:a', 'aac',
         '-b:a', '128k',
         'output.mp4'
-      );
+      ]);
       
       // İşlenmiş videoyu al
-      const data = ffmpeg.FS('readFile', 'output.mp4');
+      const data = await ffmpeg.readFile('output.mp4');
       
       // Blob oluştur ve URL'ye dönüştür
-      const blob = new Blob([data.buffer], { type: 'video/mp4' });
+      const blob = new Blob([data], { type: 'video/mp4' });
       const processedVideoUrl = URL.createObjectURL(blob);
       
       // Eski URL'yi temizle ve yeni URL'yi ayarla
