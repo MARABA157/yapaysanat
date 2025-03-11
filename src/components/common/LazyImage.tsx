@@ -8,11 +8,13 @@ interface LazyImageProps {
   height?: number;
   placeholder?: string;
   blurEffect?: boolean;
-  role?: 'banner' | 'thumbnail' | 'presentation' | 'icon';
+  role?: 'hero' | 'banner' | 'thumbnail' | 'presentation' | 'icon' | 'background' | 'gallery' | 'avatar' | 'detail';
   sizes?: string;
   priority?: boolean;
   onLoad?: () => void;
   onError?: () => void;
+  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  objectPosition?: string;
 }
 
 const LazyImage: React.FC<LazyImageProps> = ({
@@ -27,7 +29,9 @@ const LazyImage: React.FC<LazyImageProps> = ({
   sizes,
   priority = false,
   onLoad,
-  onError
+  onError,
+  objectFit,
+  objectPosition
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
@@ -155,6 +159,10 @@ const LazyImage: React.FC<LazyImageProps> = ({
         onError={handleError}
         className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         sizes={getSizes()}
+        style={{
+          objectFit: objectFit,
+          objectPosition: objectPosition
+        }}
       />
       
       {/* Hata durumu */}

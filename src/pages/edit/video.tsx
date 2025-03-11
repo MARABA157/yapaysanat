@@ -10,10 +10,8 @@ import { Progress } from '@/components/ui/progress';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 // FFmpeg yükleme durumu
-const ffmpeg = createFFmpeg({ 
-  log: true,
-  corePath: 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/ffmpeg-core.js'
-});
+const ffmpeg = createFFmpeg();
+let ffmpegLoaded = false;
 
 // Özel stil tanımı
 const pageStyle: React.CSSProperties = {
@@ -46,7 +44,6 @@ export default function VideoEditor() {
   const [duration, setDuration] = useState<number>(0);
   const [isProcessed, setIsProcessed] = useState(false);
   const [videoName, setVideoName] = useState<string>('');
-  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [ffmpegLoading, setFfmpegLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -58,11 +55,12 @@ export default function VideoEditor() {
 
   // FFmpeg'i yükle
   const loadFFmpeg = async () => {
-    if (!ffmpeg.isLoaded()) {
+    if (!ffmpegLoaded) {
       setFfmpegLoading(true);
       try {
+        // FFmpeg yükleme
         await ffmpeg.load();
-        setFfmpegLoaded(true);
+        ffmpegLoaded = true;
         toast.success('Video işleme motoru yüklendi');
       } catch (error) {
         console.error('FFmpeg yüklenemedi:', error);
@@ -71,7 +69,7 @@ export default function VideoEditor() {
         setFfmpegLoading(false);
       }
     } else {
-      setFfmpegLoaded(true);
+      ffmpegLoaded = true;
     }
   };
 
@@ -278,14 +276,13 @@ export default function VideoEditor() {
   };
 
   const processVideo = async () => {
-    if (!selectedVideo || !videoFileRef.current || !ffmpegLoaded) {
-      toast.error('Video işlenemedi. Lütfen bir video yükleyin ve tekrar deneyin.');
+    if (!videoFileRef.current) {
+      toast.error('Lütfen önce bir video yükleyin');
       return;
     }
 
     setIsProcessing(true);
     setProgress(0);
-    toast.info('Video işleniyor, lütfen bekleyin...');
 
     try {
       // Video dosyasını FFmpeg'e yükle
@@ -293,48 +290,51 @@ export default function VideoEditor() {
 
       // Filtre komutlarını oluştur
       let filterCommands = [];
-      let outputOptions = ['-c:a copy']; // Ses kanalını kopyala
-
-      // Hız değişikliği
+      
+      // Temel filtreler
+      if (videoFilters === 'grayscale') {
+        filterCommands.push('-vf', 'hue=s=0');
+      } else if (videoFilters === 'sepia') {
+        filterCommands.push('-vf', 'colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131');
+      } else if (videoFilters === 'invert') {
+        filterCommands.push('-vf', 'negate');
+      } else if (videoFilters === 'vintage') {
+        filterCommands.push('-vf', 'curves=vintage');
+      }
+      
+      // Oynatma hızı
       if (playbackRate !== 1) {
-        filterCommands.push(`setpts=${1/playbackRate}*PTS`);
-        outputOptions.push(`-filter:a "atempo=${playbackRate}"`);
+        filterCommands.push('-filter:v', `setpts=${1/playbackRate}*PTS`);
       }
-
-      // Görsel filtreler
-      if (videoFilters.includes('blur')) {
-        filterCommands.push('boxblur=5:1');
+      
+      // Ses seviyesi
+      if (volume !== 1) {
+        filterCommands.push('-filter:a', `volume=${volume}`);
       }
-      if (videoFilters.includes('brightness')) {
-        filterCommands.push('eq=brightness=0.3');
-      }
-      if (videoFilters.includes('contrast')) {
-        filterCommands.push('eq=contrast=1.5');
-      }
-      if (videoFilters.includes('grayscale')) {
-        filterCommands.push('hue=s=0');
-      }
-
-      // Filtreleri birleştir
-      let filterComplex = filterCommands.length > 0 ? `-vf "${filterCommands.join(',')}"` : '';
       
       // Kırpma işlemi
-      const trimCommand = `-ss ${startTime} -to ${endTime}`;
-
-      // İlerleme durumunu izle
+      const startTimeSeconds = (startTime / 100) * duration;
+      const endTimeSeconds = (endTime / 100) * duration;
+      const clipDuration = endTimeSeconds - startTimeSeconds;
+      
+      // FFmpeg komutunu çalıştır
       ffmpeg.setProgress(({ ratio }) => {
         setProgress(Math.round(ratio * 100));
       });
-
-      // FFmpeg komutunu çalıştır
+      
       await ffmpeg.run(
         '-i', 'input.mp4',
-        ...trimCommand.split(' '),
-        ...filterComplex.split(' ').filter(Boolean),
-        ...outputOptions.join(' ').split(' ').filter(Boolean),
+        '-ss', `${startTimeSeconds}`,
+        '-t', `${clipDuration}`,
+        ...filterCommands,
+        '-c:v', 'libx264',
+        '-preset', 'fast',
+        '-crf', '22',
+        '-c:a', 'aac',
+        '-b:a', '128k',
         'output.mp4'
       );
-
+      
       // İşlenmiş videoyu al
       const data = ffmpeg.FS('readFile', 'output.mp4');
       
@@ -346,16 +346,14 @@ export default function VideoEditor() {
       if (selectedVideo) {
         URL.revokeObjectURL(selectedVideo);
       }
-      
       setSelectedVideo(processedVideoUrl);
       setIsProcessed(true);
-      toast.success('Video başarıyla işlendi!');
+      toast.success('Video başarıyla işlendi');
     } catch (error) {
       console.error('Video işleme hatası:', error);
-      toast.error('Video işlenirken bir hata oluştu.');
+      toast.error('Video işlenirken bir hata oluştu');
     } finally {
       setIsProcessing(false);
-      setProgress(0);
     }
   };
 

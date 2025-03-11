@@ -76,18 +76,19 @@ const checkWebpSupport = async (): Promise<boolean> => {
 export interface LazyImageProps {
   src: string;
   alt: string;
+  className?: string;
   width?: number;
   height?: number;
-  className?: string;
-  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-  priority?: boolean;
   placeholder?: string;
   blurDataURL?: string;
   quality?: number;
-  role?: 'banner' | 'thumbnail' | 'gallery' | 'avatar' | 'icon' | 'background';
+  role?: 'hero' | 'banner' | 'thumbnail' | 'gallery' | 'avatar' | 'detail' | 'icon' | 'background';
   sizes?: string;
+  priority?: boolean;
   onLoad?: () => void;
   onError?: () => void;
+  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  objectPosition?: string;
 }
 
 const LazyImage = memo(({
@@ -97,6 +98,7 @@ const LazyImage = memo(({
   height,
   className,
   objectFit = 'cover',
+  objectPosition,
   priority = false,
   placeholder = 'blur',
   blurDataURL,
@@ -189,6 +191,8 @@ const LazyImage = memo(({
     if (sizes) return sizes;
     
     switch (role) {
+      case 'hero':
+        return '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px';
       case 'banner':
         return '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px';
       case 'thumbnail':
@@ -199,6 +203,10 @@ const LazyImage = memo(({
         return '150px';
       case 'background':
         return '100vw';
+      case 'gallery':
+        return '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px';
+      case 'detail':
+        return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px';
       default:
         return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px';
     }
@@ -259,6 +267,9 @@ const LazyImage = memo(({
           loaded ? "opacity-100" : "opacity-0",
           error && "hidden"
         )}
+        style={{
+          objectPosition: objectPosition
+        }}
         sizes={getSizes()}
       />
       
