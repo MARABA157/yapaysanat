@@ -7,10 +7,11 @@ import { Upload, Play, Pause, Scissors, Wand2, RotateCcw, Download, Share2, Volu
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { Progress } from '@/components/ui/progress';
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
 
 // FFmpeg yükleme durumu
-const ffmpeg = createFFmpeg();
+const ffmpeg = new FFmpeg();
 let ffmpegLoaded = false;
 
 // Özel stil tanımı
